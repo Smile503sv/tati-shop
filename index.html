@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gift Cards | Tati Shop</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <header class="main-header">
+    <div class="top-bar">
+      <img src="img/logo.svg" alt="Tati Shop Logo" class="logo-left" />
+      <div class="top-actions">
+        <button class="secundario-btn" onclick="abrirContacto()">📞 Contacto</button>
+        <button class="secundario-btn" id="auth-btn" onclick="abrirAuth()">👤 Acceder</button>
+        <button class="secundario-btn admin-only" id="admin-open" onclick="abrirAdmin()" style="display:none;">🛠️ Admin</button>
+        <button class="carrito-btn" onclick="abrirCarrito()">🛒 Ver Carrito (<span id="cart-count">0</span>)</button>
+      </div>
+    </div>
+    <div class="header-content">
+      <h1>🎁 Gift Cards Tati Shop</h1>
+      <p>Elige, regala, sorprende — digital y al instante</p>
+    </div>
+  </header>
+
+  <section class="slideshow-section">
+    <div class="slideshow" id="slideshow">
+      <button class="slide-btn prev" id="slide-prev" aria-label="Anterior">&#10094;</button>
+      <div class="slide-viewport">
+        <div class="slide-bg" id="slide-bg"></div>
+        <div class="slide-card" id="slide-card"></div>
+      </div>
+      <button class="slide-btn next" id="slide-next" aria-label="Siguiente">&#10095;</button>
+    </div>
+    <div class="slide-dots" id="slide-dots"></div>
+  </section>
+
+  <main>
+    <div class="grid" id="giftcards-grid"></div>
+  </main>
+
+  <footer>
+    © 2025 Tati Shop · Soporte:
+    <a href="mailto:ventas-online@tati-shop.com">ventas-online@tati-shop.com</a>
+  </footer>
+
+  <div class="modal" id="carrito-modal">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarCarrito()">&times;</span>
+      <h2>🛍️ Tu Carrito</h2>
+
+      <div class="cart-items" id="cart-items"></div>
+
+      <div class="checkout-box">
+        <h3>💳 Método de pago</h3>
+        <label class="pay-option">
+          <input type="radio" name="paymethod" value="whatsapp" checked>
+          <span>💬 Pagar por WhatsApp</span>
+        </label>
+        <label class="pay-option">
+          <input type="radio" name="paymethod" value="transfer">
+          <span>🏦 Transfer365 (Cuscatlán / Agrícola)</span>
+        </label>
+
+        <div id="transfer-form" class="transfer-form" style="display:none;">
+          <label for="transfer-bank">Banco al que harás la transferencia:</label>
+          <select id="transfer-bank">
+            <option value="Cuscatlán">Banco Cuscatlán</option>
+            <option value="Agrícola">Banco Agrícola</option>
+          </select>
+          <div class="bank-instructions">
+            <p><strong>Datos para Transfer365:</strong></p>
+            <ul>
+              <li><strong>Beneficiario:</strong> Tati Shop</li>
+              <li><strong>NIT:</strong> 0614-XXXXXX-XXX-X</li>
+              <li><strong>Banco:</strong> <span id="bank-label">Banco Cuscatlán</span></li>
+              <li><strong>Cuenta:</strong> 000000000-0 (Corriente)</li>
+            </ul>
+            <p>💡 Tras realizar la transferencia, envía el comprobante al WhatsApp para verificar y aprobar tu pedido.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="checkout-box">
+        <label for="buyer-note">Nota / Datos de entrega (opcional):</label>
+        <textarea id="buyer-note" placeholder="Ej: correo para envío, nombre del destinatario, mensaje en la tarjeta, etc."></textarea>
+      </div>
+
+      <div class="totals" id="totales"></div>
+
+      <div class="checkout-actions">
+        <button class="secundario-btn" onclick="vaciarCarrito()">🗑️ Vaciar carrito</button>
+        <button class="pagar-wsp-btn" id="pay-btn" onclick="procesarPago()">Pagar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="contacto-modal">
+    <div class="modal-content">
+      <span class="close" onclick="cerrarContacto()">&times;</span>
+      <h2>📞 Contáctanos</h2>
+      <p>Soporte por correo y WhatsApp:</p>
+      <ul class="contact-list">
+        <li>📧 <a href="mailto:ventas-online@tati-shop.com">ventas-online@tati-shop.com</a></li>
+        <li>💬 <a href="https://wa.me/50379553318" target="_blank" rel="noopener">WhatsApp: +503 7955 3318</a></li>
+      </ul>
+      <div class="quick-message">
+        <label for="contact-msg">Mensaje rápido (opcional):</label>
+        <textarea id="contact-msg" placeholder="Escribe tu consulta y te llevamos a WhatsApp con este texto..."></textarea>
+        <button class="pagar-wsp-btn" onclick="enviarWhatsAppContacto()">Enviar a WhatsApp</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="auth-modal">
+    <div class="modal-content auth">
+      <span class="close" onclick="cerrarAuth()">&times;</span>
+      <div class="auth-tabs">
+        <button id="tab-login" class="active" onclick="mostrarLogin()">Iniciar Sesión</button>
+        <button id="tab-register" onclick="mostrarRegistro()">Registrarse</button>
+      </div>
+      <div id="login-form" class="auth-pane">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="tu@email.com">
+        <label>Contraseña</label>
+        <input type="password" id="login-pass" placeholder="********">
+        <button class="pagar-wsp-btn" onclick="login()">Entrar</button>
+        <div class="admin-quick">
+          <button class="secundario-btn" onclick="adminAccesoRapido()">🔐 Acceso rápido Admin</button>
+        </div>
+      </div>
+      <div id="register-form" class="auth-pane" style="display:none;">
+        <label>Nombre</label>
+        <input type="text" id="reg-name" placeholder="Tu nombre">
+        <label>Email</label>
+        <input type="email" id="reg-email" placeholder="tu@email.com">
+        <label>Contraseña</label>
+        <input type="password" id="reg-pass" placeholder="********">
+        <button class="pagar-wsp-btn" onclick="registrar()">Crear cuenta</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="admin-modal">
+    <div class="modal-content admin">
+      <span class="close" onclick="cerrarAdmin()">&times;</span>
+      <h2>🛠️ Panel Admin</h2>
+
+      <div class="admin-header">
+        <div>
+          <strong>Sesión:</strong> <span id="admin-session-email">-</span>
+        </div>
+        <div class="admin-actions">
+          <button class="secundario-btn" onclick="logout()">Cerrar sesión</button>
+        </div>
+      </div>
+
+      <div class="admin-panels">
+        <div class="admin-panel">
+          <h3>📦 Pedidos</h3>
+          <div class="filters">
+            <label>Filtrar:</label>
+            <select id="orders-filter" onchange="renderPedidos()">
+              <option value="ALL">Todos</option>
+              <option value="PENDIENTE">Pendiente</option>
+              <option value="PAGADO">Pagado</option>
+              <option value="ENTREGADO">Entregado</option>
+              <option value="CANCELADO">Cancelado</option>
+            </select>
+          </div>
+          <div id="orders-list" class="list"></div>
+        </div>
+
+        <div class="admin-panel">
+          <h3>👥 Usuarios</h3>
+          <div id="users-list" class="list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
