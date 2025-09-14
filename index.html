@@ -8,14 +8,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
 </head>
 <body>
-
   <header class="main-header">
     <div class="top-bar">
       <img src="img/logo.svg" alt="Tati Shop Logo" class="logo-left" />
       <div class="top-actions">
         <button class="secundario-btn" onclick="abrirContacto()">📞 Contacto</button>
         <button class="secundario-btn" id="auth-btn" onclick="abrirAuth()">👤 Acceder</button>
-        <button class="secundario-btn admin-only" id="admin-open" onclick="abrirAdmin()" style="display:none;">🛠️ Admin</button>
+        <button class="secundario-btn" id="admin-open" onclick="abrirAdmin()" style="display:none;">🛠️ Admin</button>
         <button class="carrito-btn" onclick="abrirCarrito()">🛒 Ver Carrito (<span id="cart-count">0</span>)</button>
       </div>
     </div>
@@ -55,15 +54,13 @@
 
       <div class="checkout-box">
         <h3>💳 Método de pago</h3>
-
         <label class="pay-option">
           <input type="radio" name="paymethod" value="whatsapp" checked>
           <span>💬 Pagar por WhatsApp</span>
         </label>
-
         <label class="pay-option">
           <input type="radio" name="paymethod" value="transfer">
-          <span>🏦 Transfer365 (Cuscatlán / Agrícola)</span>
+          <span>🏦 Transferencia (Cuscatlán / Agrícola)</span>
         </label>
 
         <div id="transfer-form" class="transfer-form" style="display:none;">
@@ -72,19 +69,18 @@
             <option value="Cuscatlán">Banco Cuscatlán</option>
             <option value="Agrícola">Banco Agrícola</option>
           </select>
-
           <div class="bank-instructions">
-            <p><strong>Datos para Transfer365:</strong></p>
+            <p><strong>Datos para Transferencia:</strong></p>
             <ul id="bank-data">
             </ul>
-            <p>Tras realizar la transferencia, envía el comprobante al WhatsApp para verificar y aprobar tu pedido.</p>
+            <p>Al finalizar, envía el comprobante por WhatsApp para verificar y aprobar tu pedido.</p>
           </div>
         </div>
       </div>
 
       <div class="checkout-box">
         <label for="buyer-note">Nota / Datos de entrega (opcional):</label>
-        <textarea id="buyer-note" placeholder="Ej: correo para envío, nombre del destinatario, mensaje en la tarjeta, etc."></textarea>
+        <textarea id="buyer-note" placeholder="Correo para envío, nombre del destinatario, mensaje en la tarjeta, etc."></textarea>
       </div>
 
       <div class="totals" id="totales"></div>
@@ -106,7 +102,7 @@
       </ul>
       <div class="quick-message">
         <label for="contact-msg">Mensaje rápido (opcional):</label>
-        <textarea id="contact-msg" placeholder="Escribe tu consulta…"></textarea>
+        <textarea id="contact-msg" placeholder="Escribe tu consulta y te llevamos a WhatsApp con este texto..."></textarea>
         <button class="pagar-wsp-btn" onclick="enviarWhatsAppContacto()">Enviar a WhatsApp</button>
       </div>
     </div>
@@ -119,7 +115,6 @@
         <button id="tab-login" class="active" onclick="mostrarLogin()">Iniciar Sesión</button>
         <button id="tab-register" onclick="mostrarRegistro()">Registrarse</button>
       </div>
-
       <div id="login-form" class="auth-pane">
         <label>Email</label>
         <input type="email" id="login-email" placeholder="tu@email.com">
@@ -130,7 +125,6 @@
           <button class="secundario-btn" onclick="adminAccesoRapido()">🔐 Acceso rápido Admin</button>
         </div>
       </div>
-
       <div id="register-form" class="auth-pane" style="display:none;">
         <label>Nombre</label>
         <input type="text" id="reg-name" placeholder="Tu nombre">
@@ -150,9 +144,7 @@
 
       <div class="admin-header">
         <div><strong>Sesión:</strong> <span id="admin-session-email">-</span></div>
-        <div class="admin-actions">
-          <button class="secundario-btn" onclick="logout()">Cerrar sesión</button>
-        </div>
+        <div class="admin-actions"><button class="secundario-btn" onclick="logout()">Cerrar sesión</button></div>
       </div>
 
       <div class="admin-panels">
@@ -179,7 +171,6 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
