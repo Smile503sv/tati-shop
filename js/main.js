@@ -1,4 +1,3 @@
-/* ===== Config básica ===== */
 const IVA = 0.07;
 const WSP_NUM = '50379553318';
 const SOPORTE_MAIL = 'ventas-online@tati-shop.com';
@@ -11,37 +10,36 @@ const LS_SESS   = 'tati_session';
 
 const money = n => `$${Number(n).toFixed(2)}`;
 
-/* ===== Catálogo ===== */
 const giftcards = [
-  { id: 'amazon', nombre: 'Amazon', montos: [10, 25, 50, 100], logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg' },
-  { id: 'google', nombre: 'Google Play', montos: [10, 15, 25, 50, 100], logo: 'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Google-Play.webp' },
-  { id: 'psn', nombre: 'PlayStation', montos: [10, 20, 50, 100], logo: 'https://upload.wikimedia.org/wikipedia/commons/0/00/PlayStation_logo.svg' },
-  { id: 'xbox', nombre: 'Xbox', montos: [15, 25, 50, 100], logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e5/Xbox_Logo.svg' },
-  { id: 'steam', nombre: 'Steam', montos: [5, 10, 25, 50, 100], logo: 'https://upload.wikimedia.org/wikipedia/commons/a/ae/Steam_logo.svg' },
-  { id: 'apple', nombre: 'Apple', montos: [10, 25, 50, 100], logo: 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Apple_Logo.svg' },
-  { id: 'spotify', nombre: 'Spotify', montos: [10, 15, 30], logo: 'https://upload.wikimedia.org/wikipedia/commons/2/26/Spotify_logo_with_text.svg' },
-  { id: 'netflix', nombre: 'Netflix', montos: [15, 30, 50], logo: 'https://upload.wikimedia.org/wikipedia/commons/6/69/Netflix_logo.svg' },
-  { id: 'disney', nombre: 'Disney+', montos: [25, 50], logo: 'https://upload.wikimedia.org/wikipedia/commons/3/3e/Disney%2B_logo.svg' },
-  { id: 'uber', nombre: 'Uber', montos: [25, 50, 100], logo: 'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Uber.png' },
-  { id: 'airbnb', nombre: 'Airbnb', montos: [25, 50, 100], logo: 'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Airbnb.png' },
-  { id: 'starbucks', nombre: 'Starbucks', montos: [10, 20, 50], logo: 'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Starbucks.webp' },
-  { id: 'tiktok', nombre: 'TikTok', montos: [10, 20], logo: 'https://cdn.coinsbee.com/version2/dist/assets/img/brands/TikTok.png' },
-  { id: 'epicgames', nombre: 'Epic Games', montos: [30, 60], logo: 'https://static-assets-prod.epicgames.com/fgc-portal/static/_next/media/assets/Fortnite_Gift_Card_Art.png' },
-  { id: 'nike', nombre: 'Nike', montos: [25, 50, 100], logo: 'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Nike.png' },
-  { id: 'adidas', nombre: 'Adidas', montos: [25, 50], logo: 'https://cdn.coinsbee.com/version2/dist/assets/img/brands/adidas.png' },
-  { id: 'sephora', nombre: 'Sephora', montos: [25, 50, 75], logo: 'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Sephora.png' },
-  { id: 'walmart', nombre: 'Walmart', montos: [20, 40, 100], logo: 'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Walmart.png' },
-  { id: 'target', nombre: 'Target', montos: [20, 50], logo: 'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Target.webp' },
-  { id: 'bestbuy', nombre: 'Best Buy', montos: [25, 50], logo: 'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Best-Buy.webp' },
-  { id: 'hbo', nombre: 'HBO Max', montos: [30, 50], logo: 'https://cdn.coinsbee.com/version2/dist/assets/img/brands/HBO.png' },
-  { id: 'homeDepot', nombre: 'Home Depot', montos: [50, 100], logo: 'https://images.thdstatic.com/giftcards/catalog/53L1QLAXWKVF06WJ8DLHBYT6S8/xxlarge/RH6VN7060A1LR3FWD0WJKNVBV8_0608202315:36:58.PNG' },
-  { id: 'lowes', nombre: "Lowe's", montos: [25, 50], logo: 'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Lowes.png' },
-  { id: 'rolex', nombre: 'Rolex', montos: [250], logo: 'https://media.rolex.com/image/upload/q_auto:eco/f_auto/c_limit,w_1920/v1724322589/rolexcom/rolex-retailers/rolex-certified-pre-owned-watches/2024-updates/rcpo-rolex-certified-pre-owned-watches-elmt_2403ac_007' },
-  { id: 'discord', nombre: 'Discord Nitro', montos: [10, 15], logo: 'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Discord.png' },
-  { id: 'facebook', nombre: 'Facebook', montos: [25], logo: 'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Facebook-Ads-by-Rewarble.png' },
-  { id: 'roblox', nombre: 'Roblox', montos: [10, 25], logo: 'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Roblox.png' },
-  { id: 'visa', nombre: 'Visa Prepaid', montos: [25, 50, 100], logo: 'https://cdn.coinsbee.com/version2/dist/assets/img/brands/My-Prepaid-Center-VISA.png' },
-  { id: 'mastercard', nombre: 'MasterCard Prepaid', montos: [25, 50, 100], logo: 'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Mastercard-by-Rewarble.png' }
+  { id:'amazon', nombre:'Amazon', montos:[10,25,50,100], logo:'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg' },
+  { id:'google', nombre:'Google Play', montos:[10,15,25,50,100], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Google-Play.webp' },
+  { id:'psn', nombre:'PlayStation', montos:[10,20,50,100], logo:'https://upload.wikimedia.org/wikipedia/commons/0/00/PlayStation_logo.svg' },
+  { id:'xbox', nombre:'Xbox', montos:[15,25,50,100], logo:'https://upload.wikimedia.org/wikipedia/commons/e/e5/Xbox_Logo.svg' },
+  { id:'steam', nombre:'Steam', montos:[5,10,25,50,100], logo:'https://upload.wikimedia.org/wikipedia/commons/a/ae/Steam_logo.svg' },
+  { id:'apple', nombre:'Apple', montos:[10,25,50,100], logo:'https://upload.wikimedia.org/wikipedia/commons/8/8a/Apple_Logo.svg' },
+  { id:'spotify', nombre:'Spotify', montos:[10,15,30], logo:'https://upload.wikimedia.org/wikipedia/commons/2/26/Spotify_logo_with_text.svg' },
+  { id:'netflix', nombre:'Netflix', montos:[15,30,50], logo:'https://upload.wikimedia.org/wikipedia/commons/6/69/Netflix_logo.svg' },
+  { id:'disney', nombre:'Disney+', montos:[25,50], logo:"https://upload.wikimedia.org/wikipedia/commons/3/3e/Disney%2B_logo.svg" },
+  { id:'uber', nombre:'Uber', montos:[25,50,100], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Uber.png' },
+  { id:'airbnb', nombre:'Airbnb', montos:[25,50,100], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Airbnb.png' },
+  { id:'starbucks', nombre:'Starbucks', montos:[10,20,50], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Starbucks.webp' },
+  { id:'tiktok', nombre:'TikTok', montos:[10,20], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/TikTok.png' },
+  { id:'epicgames', nombre:'Epic Games', montos:[30,60], logo:'https://static-assets-prod.epicgames.com/fgc-portal/static/_next/media/assets/Fortnite_Gift_Card_Art.png' },
+  { id:'nike', nombre:'Nike', montos:[25,50,100], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Nike.png' },
+  { id:'adidas', nombre:'Adidas', montos:[25,50], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/adidas.png' },
+  { id:'sephora', nombre:'Sephora', montos:[25,50,75], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Sephora.png' },
+  { id:'walmart', nombre:'Walmart', montos:[20,40,100], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Walmart.png' },
+  { id:'target', nombre:'Target', montos:[20,50], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Target.webp' },
+  { id:'bestbuy', nombre:'Best Buy', montos:[25,50], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Best-Buy.webp' },
+  { id:'hbo', nombre:'HBO Max', montos:[30,50], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/HBO.png' },
+  { id:'homeDepot', nombre:'Home Depot', montos:[50,100], logo:'https://images.thdstatic.com/giftcards/catalog/53L1QLAXWKVF06WJ8DLHBYT6S8/xxlarge/RH6VN7060A1LR3FWD0WJKNVBV8_0608202315:36:58.PNG' },
+  { id:'lowes', nombre:"Lowe's", montos:[25,50], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Lowes.png' },
+  { id:'rolex', nombre:'Rolex', montos:[250], logo:'https://media.rolex.com/image/upload/q_auto:eco/f_auto/c_limit,w_1920/v1724322589/rolexcom/rolex-retailers/rolex-certified-pre-owned-watches/2024-updates/rcpo-rolex-certified-pre-owned-watches-elmt_2403ac_007' },
+  { id:'discord', nombre:'Discord Nitro', montos:[10,15], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Discord.png' },
+  { id:'facebook', nombre:'Facebook', montos:[25], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Facebook-Ads-by-Rewarble.png' },
+  { id:'roblox', nombre:'Roblox', montos:[10,25], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Roblox.png' },
+  { id:'visa', nombre:'Visa Prepaid', montos:[25,50,100], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/My-Prepaid-Center-VISA.png' },
+  { id:'mastercard', nombre:'MasterCard Prepaid', montos:[25,50,100], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Mastercard-by-Rewarble.png' }
 ];
 
 const descripciones = {
@@ -66,7 +64,6 @@ const brandBg = {
   steam:['#151A21','#2A475E']
 };
 
-/* ===== Helpers de almacenamiento local ===== */
 const getUsers  = () => JSON.parse(localStorage.getItem(LS_USERS)  || '[]');
 const setUsers  = v  => localStorage.setItem(LS_USERS,  JSON.stringify(v));
 const getOrders = () => JSON.parse(localStorage.getItem(LS_ORDERS) || '[]');
@@ -75,7 +72,6 @@ const getSess   = () => JSON.parse(localStorage.getItem(LS_SESS)   || 'null');
 const setSess   = v  => localStorage.setItem(LS_SESS,   JSON.stringify(v));
 const clearSess = () => localStorage.removeItem(LS_SESS);
 
-/* ===== Carrito ===== */
 let carrito = [];
 
 function renderGiftCards(){
@@ -130,10 +126,12 @@ function actualizarCarritoListado(){
   const items = agruparCarrito(carrito);
   let sub = 0;
   cart.innerHTML = items.map(it=>{
-    const linea = it.precio*it.cantidad; sub+=linea;
+    const linea = it.precio * it.cantidad; sub += linea;
     return `<p>${it.nombre} — ${it.cantidad} × ${money(it.precio)} = <strong>${money(linea)}</strong></p>`;
   }).join('');
-  const iva = sub*IVA, total=sub+iva;
+
+  const iva = sub * IVA;
+  const total = sub + iva;
   totales.innerHTML = `
     <p><strong>Subtotal:</strong> ${money(sub)}</p>
     <p><strong>IVA (${(IVA*100).toFixed(0)}%):</strong> ${money(iva)}</p>
@@ -145,7 +143,6 @@ function vaciarCarrito(){ carrito=[]; actualizarCarritoListado(); }
 function abrirCarrito(){ document.getElementById('carrito-modal').style.display='flex'; }
 function cerrarCarrito(){ document.getElementById('carrito-modal').style.display='none'; }
 
-/* ===== Pago + pedidos ===== */
 function buildOrderSummary(){
   const items = agruparCarrito(carrito);
   let sub=0;
@@ -190,8 +187,8 @@ function pagarWhatsAppFlow(nota){
 
 function pagarTransferFlow(nota){
   const banco = document.getElementById('transfer-bank').value;
-  const o = crearPedido({metodo:'transfer', banco, nota});
-  alert(`Pedido creado (${o.id}). Envía el comprobante por WhatsApp para verificarlo.`);
+  crearPedido({metodo:'transfer', banco, nota});
+  alert(`Pedido creado. Banco: ${banco}. Envía tu comprobante por WhatsApp para verificarlo.`);
 }
 
 function procesarPago(){
@@ -201,7 +198,6 @@ function procesarPago(){
   if(metodo==='transfer') pagarTransferFlow(nota); else pagarWhatsAppFlow(nota);
 }
 
-/* ===== Transferencia: datos de banco ===== */
 document.addEventListener('change',e=>{
   if(e.target.name==='paymethod'){
     const show = e.target.value==='transfer';
@@ -228,7 +224,6 @@ document.addEventListener('change',e=>{
   }
 });
 
-/* ===== Contacto ===== */
 function abrirContacto(){ document.getElementById('contacto-modal').style.display='flex'; }
 function cerrarContacto(){ document.getElementById('contacto-modal').style.display='none'; }
 function enviarWhatsAppContacto(){
@@ -236,7 +231,6 @@ function enviarWhatsAppContacto(){
   window.open(`https://wa.me/${WSP_NUM}?text=${encodeURIComponent(t)}`,'_blank');
 }
 
-/* ===== Auth local (solo navegador) ===== */
 async function hash(t){
   const enc = new TextEncoder().encode(t);
   const buf = await crypto.subtle.digest('SHA-256', enc);
@@ -245,6 +239,7 @@ async function hash(t){
 
 function abrirAuth(){ document.getElementById('auth-modal').style.display='flex'; }
 function cerrarAuth(){ document.getElementById('auth-modal').style.display='none'; }
+
 function mostrarLogin(){
   document.getElementById('tab-login').classList.add('active');
   document.getElementById('tab-register').classList.remove('active');
@@ -266,6 +261,7 @@ async function registrar(){
 
   const users = getUsers();
   if(users.some(u=>u.email===email)){ alert('Ese email ya está registrado'); return; }
+
   const passh = await hash(pass);
   users.push({ name, email, passh, createdAt:new Date().toISOString() });
   setUsers(users);
@@ -292,20 +288,14 @@ async function login(){
   alert('Sesión iniciada.');
 }
 
-function logout(){
-  clearSess();
-  actualizarUIAuth();
-  alert('Sesión cerrada.');
-}
+function logout(){ clearSess(); actualizarUIAuth(); alert('Sesión cerrada.'); }
 
 function adminAccesoRapido(){
   const pin = prompt('PIN admin:');
   if(pin===ADMIN_PIN){
     setSess({ email: ADMIN_EMAIL, name:'Administrador', isAdmin:true });
-    actualizarUIAuth();
-    cerrarAuth();
-    abrirAdmin();
-  }else{ alert('PIN incorrecto'); }
+    actualizarUIAuth(); cerrarAuth(); abrirAdmin();
+  }else alert('PIN incorrecto');
 }
 
 function actualizarUIAuth(){
@@ -317,8 +307,7 @@ function actualizarUIAuth(){
     btn.textContent = `👤 ${sess.name || sess.email}`;
     btn.onclick = () => { if(confirm('¿Cerrar sesión?')) logout(); };
     adminBtn.style.display = sess.isAdmin ? 'inline-block' : 'none';
-    const span = document.getElementById('admin-session-email');
-    if(span) span.textContent = sess.email;
+    const span = document.getElementById('admin-session-email'); if(span) span.textContent = sess.email;
   }else{
     btn.textContent = '👤 Acceder';
     btn.onclick = abrirAuth;
@@ -326,13 +315,11 @@ function actualizarUIAuth(){
   }
 }
 
-/* ===== Panel Admin ===== */
 function abrirAdmin(){
   const s = getSess();
   if(!(s?.isAdmin)){ abrirAuth(); return; }
   document.getElementById('admin-modal').style.display='flex';
-  renderPedidos();
-  renderUsuarios();
+  renderPedidos(); renderUsuarios();
 }
 function cerrarAdmin(){ document.getElementById('admin-modal').style.display='none'; }
 
@@ -341,7 +328,6 @@ function renderPedidos(){
   const filter = document.getElementById('orders-filter')?.value || 'ALL';
   const orders = getOrders();
   const rows = (filter==='ALL'?orders:orders.filter(o=>o.estado===filter));
-
   list.innerHTML = rows.length ? '' : '<p class="small">No hay pedidos.</p>';
   rows.forEach(o=>{
     const d = document.createElement('div');
@@ -387,7 +373,7 @@ function renderUsuarios(){
     d.className='order';
     d.innerHTML = `
       <div class="row"><strong>${u.name || '(sin nombre)'}</strong><span class="small">${u.email}</span></div>
-      <div class="small">Registrado: ${new Date(u.createdAt).toLocaleString?.() || ''}</div>
+      <div class="small">Registrado: ${new Date(u.createdAt).toLocaleString()}</div>
     `;
     list.appendChild(d);
   });
@@ -452,8 +438,5 @@ window.onload = ()=>{
   renderGiftCards();
   actualizarCarritoListado();
   const bankSelect = document.getElementById('transfer-bank');
-  if(bankSelect){
-    bankSelect.value = 'Cuscatlán';
-    bankSelect.dispatchEvent(new Event('change'));
-  }
+  if(bankSelect){ bankSelect.value='Cuscatlán'; bankSelect.dispatchEvent(new Event('change')); }
 };
