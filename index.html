@@ -46,6 +46,7 @@
     <a href="mailto:ventas-online@tati-shop.com">ventas-online@tati-shop.com</a>
   </footer>
 
+  <!-- Carrito -->
   <div class="modal" id="carrito-modal">
     <div class="modal-content">
       <span class="close" onclick="cerrarCarrito()">&times;</span>
@@ -72,8 +73,7 @@
           </select>
           <div class="bank-instructions">
             <p><strong>Datos para Transfer365:</strong></p>
-            <ul id="bank-lines">
-            </ul>
+            <ul id="bank-lines"></ul>
             <p>💡 Tras realizar la transferencia, envía el comprobante al WhatsApp para verificar y aprobar tu pedido.</p>
           </div>
         </div>
@@ -93,6 +93,7 @@
     </div>
   </div>
 
+  <!-- Contacto -->
   <div class="modal" id="contacto-modal">
     <div class="modal-content">
       <span class="close" onclick="cerrarContacto()">&times;</span>
@@ -110,6 +111,7 @@
     </div>
   </div>
 
+  <!-- Auth -->
   <div class="modal" id="auth-modal">
     <div class="modal-content auth">
       <span class="close" onclick="cerrarAuth()">&times;</span>
@@ -139,18 +141,15 @@
     </div>
   </div>
 
+  <!-- Admin -->
   <div class="modal" id="admin-modal">
     <div class="modal-content admin">
       <span class="close" onclick="cerrarAdmin()">&times;</span>
       <h2>🛠️ Panel Admin</h2>
 
       <div class="admin-header">
-        <div>
-          <strong>Sesión:</strong> <span id="admin-session-email">-</span>
-        </div>
-        <div class="admin-actions">
-          <button class="secundario-btn" onclick="logout()">Cerrar sesión</button>
-        </div>
+        <div><strong>Sesión:</strong> <span id="admin-session-email">-</span></div>
+        <div class="admin-actions"><button class="secundario-btn" onclick="logout()">Cerrar sesión</button></div>
       </div>
 
       <div class="admin-panels">
@@ -177,6 +176,7 @@
     </div>
   </div>
 
+  <!-- App -->
   <script type="module" src="js/main.js"></script>
 </body>
 </html>
