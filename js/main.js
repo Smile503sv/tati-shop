@@ -175,7 +175,7 @@ function crearPedido(meta) {
     subtotal: subtotalSinIva,
     iva,
     total,
-    estado: meta.metodo === 'transfer' ? 'PENDIENTE' : 'PENDIENTE', // arranca pendiente; admin lo cambia
+    estado: 'PENDIENTE',
     metodo: meta.metodo,
     banco: meta.banco || null,
     nota: meta.nota || '',
@@ -216,15 +216,52 @@ function procesarPago(){
   else pagarWhatsAppFlow(nota);
 }
 
+const cuentasBancarias = {
+  "Cuscatlán": {
+    beneficiario: "MARGARITA CASTRO",
+    cuenta: "401495002273779",
+    tipo: "Ahorros"
+  },
+  "Agrícola": {
+    beneficiario: "ELSA CASTRO",
+    cuenta: "3710993183",
+    tipo: "Ahorros"
+  }
+};
+
+function actualizarDatosBanco() {
+  const select = document.getElementById('transfer-bank');
+  if (!select) return;
+  const banco = select.value;
+  const datos = cuentasBancarias[banco];
+  const cont = document.getElementById('bank-instructions');
+  if (!cont || !datos) return;
+
+  cont.innerHTML = `
+    <p><strong>Datos para Transfer365:</strong></p>
+    <ul>
+      <li><strong>Beneficiario:</strong> ${datos.beneficiario}</li>
+      <li><strong>Banco:</strong> Banco ${banco}</li>
+      <li><strong>Cuenta:</strong> ${datos.cuenta} (${datos.tipo})</li>
+    </ul>
+    <p>💡 Tras realizar la transferencia, envía el comprobante al WhatsApp para verificar y aprobar tu pedido.</p>
+  `;
+}
+
 document.addEventListener('change', (e)=>{
   if(e.target.name==='paymethod'){
     const isTransfer = e.target.value==='transfer';
-    document.getElementById('transfer-form').style.display = isTransfer ? 'block' : 'none';
+    const form = document.getElementById('transfer-form');
+    if (form) {
+      form.style.display = isTransfer ? 'block' : 'none';
+      if (isTransfer) actualizarDatosBanco();
+    }
   }
 });
+
 document.addEventListener('change', (e)=>{
   if(e.target.id==='transfer-bank'){
-    document.getElementById('bank-label').textContent = 'Banco ' + e.target.value;
+    actualizarDatosBanco();
   }
 });
 
@@ -395,7 +432,7 @@ function renderUsuarios(){
     const d = document.createElement('div');
     d.className='order';
     d.innerHTML = `
-      <div class="row"><strong>${u.name || '(sin nombre)'}</strong><span class="small">${u.email}</span></div>
+      <div class="row"><strong>${u.name || '(sin nombre)'} </strong><span class="small">${u.email}</span></div>
       <div class="small">Registrado: ${new Date(u.createdAt).toLocaleString()}</div>
     `;
     list.appendChild(d);
@@ -466,4 +503,13 @@ window.onload = () => {
   initSlideshow();
   renderGiftCards();
   actualizarCarritoListado();
+
+  const payRadio = [...document.querySelectorAll('input[name="paymethod"]')].find(r=>r.checked);
+  if (payRadio && payRadio.value === 'transfer') {
+    const form = document.getElementById('transfer-form');
+    if (form) {
+      form.style.display = 'block';
+      actualizarDatosBanco();
+    }
+  }
 };
