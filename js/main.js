@@ -4,11 +4,37 @@ const SOPORTE_MAIL = 'ventas-online@tati-shop.com';
 const ADMIN_EMAIL = SOPORTE_MAIL;
 const ADMIN_PIN = '8642';
 
-const LS_USERS  = 'tati_users';
 const LS_ORDERS = 'tati_orders';
-const LS_SESS   = 'tati_session';
+
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js';
+import {
+  getAuth,
+  setPersistence,
+  browserLocalPersistence,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  updateProfile,
+  signInWithEmailAndPassword,
+  signOut
+} from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBbx5r5avAQBWqCmRcLdh4vFmlGimio4",
+  authDomain: "tati-shop-73291.firebaseapp.com",
+  projectId: "tati-shop-73291",
+  storageBucket: "tati-shop-73291.appspot.com",
+  messagingSenderId: "160273697599",
+  appId: "1:160273697599:web:8c256c5f0bd051d4b4f00a",
+  measurementId: "G-QQJE1I8S9L"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+await setPersistence(auth, browserLocalPersistence);
 
 const money = n => `$${Number(n).toFixed(2)}`;
+const getOrders = () => JSON.parse(localStorage.getItem(LS_ORDERS) || '[]');
+const setOrders = v  => localStorage.setItem(LS_ORDERS, JSON.stringify(v));
 
 const giftcards = [
   { id: 'amazon', nombre: 'Amazon', montos: [10, 25, 50, 100], logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg' },
@@ -64,14 +90,6 @@ const brandBg = {
   steam:   ['#151A21', '#2A475E']
 };
 
-const getUsers  = () => JSON.parse(localStorage.getItem(LS_USERS)  || '[]');
-const setUsers  = v  => localStorage.setItem(LS_USERS,  JSON.stringify(v));
-const getOrders = () => JSON.parse(localStorage.getItem(LS_ORDERS) || '[]');
-const setOrders = v  => localStorage.setItem(LS_ORDERS, JSON.stringify(v));
-const getSess   = () => JSON.parse(localStorage.getItem(LS_SESS)   || 'null');
-const setSess   = v  => localStorage.setItem(LS_SESS,   JSON.stringify(v));
-const clearSess = () => localStorage.removeItem(LS_SESS);
-
 let carrito = [];
 
 function renderGiftCards() {
@@ -94,12 +112,12 @@ function renderGiftCards() {
   });
 }
 
-function agregarAlCarrito(id, nombre, selectId) {
+window.agregarAlCarrito = (id, nombre, selectId) => {
   const select = document.getElementById(selectId);
   const monto = parseFloat(select.value);
   carrito.push({ id, nombre, precio: monto });
   actualizarCarritoListado();
-}
+};
 
 function agruparCarrito(items) {
   const map = new Map();
@@ -146,9 +164,9 @@ function actualizarCarritoListado() {
   `;
 }
 
-function vaciarCarrito(){ carrito = []; actualizarCarritoListado(); }
-function abrirCarrito(){ document.getElementById('carrito-modal').style.display='flex'; }
-function cerrarCarrito(){ document.getElementById('carrito-modal').style.display='none'; }
+window.vaciarCarrito  = () => { carrito = []; actualizarCarritoListado(); };
+window.abrirCarrito   = () => { document.getElementById('carrito-modal').style.display='flex'; };
+window.cerrarCarrito  = () => { document.getElementById('carrito-modal').style.display='none'; };
 
 function buildOrderSummary() {
   const agrupado = agruparCarrito(carrito);
@@ -160,18 +178,17 @@ function buildOrderSummary() {
   });
   const iva = subtotalSinIva * IVA;
   const total = subtotalSinIva + iva;
-  return { lines, subtotalSinIva, iva, total };
+  return { lines, subtotalSinIva, iva, total, items: agrupado };
 }
 
 function crearPedido(meta) {
-  const { lines, subtotalSinIva, iva, total } = buildOrderSummary();
-  const sess = getSess();
-  const userEmail = sess?.email || 'invitado';
+  const { lines, subtotalSinIva, iva, total, items } = buildOrderSummary();
+  const userEmail = auth.currentUser?.email || 'invitado';
 
   const order = {
     id: 'PED-' + Date.now(),
     userEmail,
-    items: agruparCarrito(carrito),
+    items,
     subtotal: subtotalSinIva,
     iva,
     total,
@@ -203,178 +220,163 @@ function pagarWhatsAppFlow(nota) {
 function pagarTransferFlow(nota) {
   const banco = document.getElementById('transfer-bank').value;
   const order = crearPedido({ metodo:'transfer', banco, nota });
-
-  alert(`Pedido creado (${order.id}).\nBanco seleccionado: ${banco}.\nEnvía tu comprobante por WhatsApp para verificarlo.`);
+  alert(`Pedido creado (${order.id}). Banco seleccionado: ${banco}. Envía tu comprobante por WhatsApp para verificarlo.`);
 }
 
-function procesarPago(){
+window.procesarPago = () => {
   if (carrito.length === 0) { alert('Tu carrito está vacío.'); return; }
   const metodo = [...document.querySelectorAll('input[name="paymethod"]')].find(r=>r.checked)?.value || 'whatsapp';
   const nota = (document.getElementById('buyer-note')?.value || '').trim();
-
   if(metodo==='transfer') pagarTransferFlow(nota);
   else pagarWhatsAppFlow(nota);
-}
+};
 
 const cuentasBancarias = {
-  "Cuscatlán": {
-    beneficiario: "MARGARITA CASTRO",
-    cuenta: "401495002273779",
-    tipo: "Ahorros"
+  'Cuscatlán': {
+    beneficiario: 'MARGARITA CASTRO',
+    tipo: 'AHORROS',
+    cuenta: '401495002273779',
+    banco: 'Banco Cuscatlán'
   },
-  "Agrícola": {
-    beneficiario: "ELSA CASTRO",
-    cuenta: "3710993183",
-    tipo: "Ahorros"
+  'Agrícola': {
+    beneficiario: 'ELSA CASTRO',
+    tipo: 'AHORROS',
+    cuenta: '3710993183',
+    banco: 'Banco Agrícola'
   }
 };
 
-function actualizarDatosBanco() {
-  const select = document.getElementById('transfer-bank');
-  if (!select) return;
-  const banco = select.value;
-  const datos = cuentasBancarias[banco];
-  const cont = document.getElementById('bank-instructions');
-  if (!cont || !datos) return;
-
-  cont.innerHTML = `
-    <p><strong>Datos para Transfer365:</strong></p>
-    <ul>
-      <li><strong>Beneficiario:</strong> ${datos.beneficiario}</li>
-      <li><strong>Banco:</strong> Banco ${banco}</li>
-      <li><strong>Cuenta:</strong> ${datos.cuenta} (${datos.tipo})</li>
-    </ul>
-    <p>💡 Tras realizar la transferencia, envía el comprobante al WhatsApp para verificar y aprobar tu pedido.</p>
+function pintarDatosBanco(nombre) {
+  const info = cuentasBancarias[nombre];
+  const ul = document.getElementById('bank-lines');
+  if (!info || !ul) return;
+  ul.innerHTML = `
+    <li><strong>Beneficiario:</strong> ${info.beneficiario}</li>
+    <li><strong>Banco:</strong> <span id="bank-label">${info.banco}</span></li>
+    <li><strong>Cuenta:</strong> ${info.cuenta} (${info.tipo})</li>
   `;
 }
 
 document.addEventListener('change', (e)=>{
   if(e.target.name==='paymethod'){
     const isTransfer = e.target.value==='transfer';
-    const form = document.getElementById('transfer-form');
-    if (form) {
-      form.style.display = isTransfer ? 'block' : 'none';
-      if (isTransfer) actualizarDatosBanco();
-    }
+    document.getElementById('transfer-form').style.display = isTransfer ? 'block' : 'none';
   }
-});
-
-document.addEventListener('change', (e)=>{
   if(e.target.id==='transfer-bank'){
-    actualizarDatosBanco();
+    pintarDatosBanco(e.target.value);
   }
 });
 
-function abrirContacto(){ document.getElementById('contacto-modal').style.display='flex'; }
-function cerrarContacto(){ document.getElementById('contacto-modal').style.display='none'; }
-function enviarWhatsAppContacto(){
+window.abrirContacto  = () => { document.getElementById('contacto-modal').style.display='flex'; };
+window.cerrarContacto = () => { document.getElementById('contacto-modal').style.display='none'; };
+window.enviarWhatsAppContacto = () => {
   const texto = (document.getElementById('contact-msg')?.value || '').trim() || 'Hola, necesito ayuda.';
   const url = `https://wa.me/${WSP_NUM}?text=${encodeURIComponent(texto)}`;
   window.open(url,'_blank');
-}
+};
 
-async function hash(text){
-  const enc = new TextEncoder().encode(text);
-  const buf = await crypto.subtle.digest('SHA-256', enc);
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
+window.abrirAuth  = () => { document.getElementById('auth-modal').style.display='flex'; };
+window.cerrarAuth = () => { document.getElementById('auth-modal').style.display='none'; };
 
-function abrirAuth(){ document.getElementById('auth-modal').style.display='flex'; }
-function cerrarAuth(){ document.getElementById('auth-modal').style.display='none'; }
-function mostrarLogin(){
+window.mostrarLogin = () => {
   document.getElementById('tab-login').classList.add('active');
   document.getElementById('tab-register').classList.remove('active');
   document.getElementById('login-form').style.display='grid';
   document.getElementById('register-form').style.display='none';
-}
-function mostrarRegistro(){
+};
+window.mostrarRegistro = () => {
   document.getElementById('tab-register').classList.add('active');
   document.getElementById('tab-login').classList.remove('active');
   document.getElementById('register-form').style.display='grid';
   document.getElementById('login-form').style.display='none';
-}
+};
 
-async function registrar(){
+window.registrar = async () => {
   const name = document.getElementById('reg-name').value.trim();
   const email = document.getElementById('reg-email').value.trim().toLowerCase();
   const pass = document.getElementById('reg-pass').value;
-  if(!name || !email || !pass) return alert('Completa todos los campos');
+  if(!name || !email || !pass){ alert('Completa todos los campos'); return; }
 
-  const users = getUsers();
-  if(users.some(u=>u.email===email)) return alert('Ese email ya está registrado');
+  try{
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(cred.user, { displayName: name });
+    await sendEmailVerification(cred.user);
+    alert('Cuenta creada. Revisa tu correo y verifica tu email para poder iniciar sesión.');
+    cerrarAuth();
+  }catch(err){
+    alert('Error al registrar: ' + err.message);
+  }
+};
 
-  const passh = await hash(pass);
-  users.push({ name, email, passh, createdAt: new Date().toISOString() });
-  setUsers(users);
-  setSess({ email, name, isAdmin: email===ADMIN_EMAIL });
-  actualizarUIAuth();
-  cerrarAuth();
-  alert('Cuenta creada. ¡Bienvenido!');
-}
-
-async function login(){
+window.login = async () => {
   const email = document.getElementById('login-email').value.trim().toLowerCase();
-  const pass = document.getElementById('login-pass').value;
-  if(!email || !pass) return alert('Completa email y contraseña');
+  const pass  = document.getElementById('login-pass').value;
+  if(!email || !pass){ alert('Completa email y contraseña'); return; }
 
-  const users = getUsers();
-  const u = users.find(u=>u.email===email);
-  if(!u) return alert('No existe ese usuario');
-
-  const passh = await hash(pass);
-  if(passh !== u.passh) return alert('Contraseña incorrecta');
-
-  setSess({ email: u.email, name: u.name, isAdmin: email===ADMIN_EMAIL });
-  actualizarUIAuth();
-  cerrarAuth();
-  alert('Sesión iniciada.');
-}
-
-function logout(){
-  clearSess();
-  actualizarUIAuth();
-  alert('Sesión cerrada.');
-}
-
-function adminAccesoRapido(){
-  const pin = prompt('PIN admin:');
-  if(pin === ADMIN_PIN){
-    setSess({ email: ADMIN_EMAIL, name: 'Administrador', isAdmin: true });
+  try{
+    const cred = await signInWithEmailAndPassword(auth, email, pass);
+    if(!cred.user.emailVerified){
+      if(confirm('Debes verificar tu correo antes de continuar. ¿Reenviar verificación?')){
+        await sendEmailVerification(cred.user);
+      }
+      await signOut(auth);
+      return;
+    }
     actualizarUIAuth();
     cerrarAuth();
+    alert('Sesión iniciada.');
+  }catch(err){
+    alert('Error al iniciar sesión: ' + err.message);
+  }
+};
+
+window.logout = async () => {
+  await signOut(auth);
+  actualizarUIAuth();
+  alert('Sesión cerrada.');
+};
+
+window.adminAccesoRapido = () => {
+  const pin = prompt('PIN admin:');
+  if(pin === ADMIN_PIN){
+    alert('Acceso admin temporal para revisar panel (usar con cuidado).');
     abrirAdmin();
   }else{
     alert('PIN incorrecto');
   }
-}
+};
 
 function actualizarUIAuth(){
-  const sess = getSess();
-  const authBtn = document.getElementById('auth-btn');
-  const adminOpen = document.getElementById('admin-open');
+  const user = auth.currentUser;
+  const authBtn  = document.getElementById('auth-btn');
+  const adminBtn = document.getElementById('admin-open');
 
-  if(sess){
-    authBtn.textContent = `👤 ${sess.name || sess.email}`;
+  if(user && user.emailVerified){
+    const nombre = user.displayName || user.email;
+    authBtn.textContent = `👤 ${nombre}`;
     authBtn.onclick = () => { if(confirm('¿Cerrar sesión?')) logout(); };
-    adminOpen.style.display = sess.isAdmin ? 'inline-block' : 'none';
-    document.getElementById('admin-session-email')?.replaceChildren(document.createTextNode(sess.email));
+    adminBtn.style.display = (user.email === ADMIN_EMAIL) ? 'inline-block' : 'none';
+    const span = document.getElementById('admin-session-email');
+    if (span) span.textContent = user.email;
   }else{
     authBtn.textContent = '👤 Acceder';
     authBtn.onclick = abrirAuth;
-    adminOpen.style.display = 'none';
+    adminBtn.style.display = 'none';
   }
 }
 
-function abrirAdmin(){
-  const sess = getSess();
-  if(!(sess?.isAdmin) && !confirm('No eres admin. ¿Intentar acceso rápido?')) return abrirAuth();
+window.abrirAdmin = () => {
+  const user = auth.currentUser;
+  if(!(user && user.emailVerified && user.email === ADMIN_EMAIL)){
+    if(!confirm('No eres admin verificado. Esta vista es solo de prueba local. ¿Continuar?')) return;
+  }
   document.getElementById('admin-modal').style.display='flex';
   renderPedidos();
   renderUsuarios();
-}
-function cerrarAdmin(){ document.getElementById('admin-modal').style.display='none'; }
+};
+window.cerrarAdmin = () => { document.getElementById('admin-modal').style.display='none'; };
 
-function renderPedidos(){
+window.renderPedidos = () => {
   const list = document.getElementById('orders-list');
   const filter = document.getElementById('orders-filter')?.value || 'ALL';
   const orders = getOrders();
@@ -402,9 +404,9 @@ function renderPedidos(){
     `;
     list.appendChild(div);
   });
-}
+};
 
-function cambiarEstado(id, estado){
+window.cambiarEstado = (id, estado) => {
   const orders = getOrders();
   const idx = orders.findIndex(o=>o.id===id);
   if(idx>-1){
@@ -412,9 +414,9 @@ function cambiarEstado(id, estado){
     setOrders(orders);
     renderPedidos();
   }
-}
+};
 
-function enviarWhatsDePedido(id){
+window.enviarWhatsDePedido = (id) => {
   const orders = getOrders();
   const o = orders.find(x=>x.id===id);
   if(!o) return;
@@ -422,22 +424,21 @@ function enviarWhatsDePedido(id){
   let msg = `*Pedido Tati Shop – ${id}*\nCliente: ${o.userEmail}\n\n*Artículos:*\n${lines.join('\n')}\n\n*Subtotal:* ${money(o.subtotal)}\n*IVA:* ${money(o.iva)}\n*Total:* ${money(o.total)}\n*Estado:* ${o.estado}\n*Método:* ${o.metodo}${o.banco?(' ('+o.banco+')'):''}`;
   const url = `https://wa.me/${WSP_NUM}?text=${encodeURIComponent(msg)}`;
   window.open(url,'_blank');
-}
+};
 
-function renderUsuarios(){
+window.renderUsuarios = () => {
   const list = document.getElementById('users-list');
-  const users = getUsers();
-  list.innerHTML = users.length ? '' : '<p class="small">Sin usuarios registrados.</p>';
-  users.forEach(u=>{
-    const d = document.createElement('div');
-    d.className='order';
-    d.innerHTML = `
-      <div class="row"><strong>${u.name || '(sin nombre)'} </strong><span class="small">${u.email}</span></div>
-      <div class="small">Registrado: ${new Date(u.createdAt).toLocaleString()}</div>
-    `;
-    list.appendChild(d);
-  });
-}
+  const user = auth.currentUser;
+  list.innerHTML = '';
+  if(!user){ list.innerHTML = '<p class="small">Sin sesión activa.</p>'; return; }
+  const d = document.createElement('div');
+  d.className='order';
+  d.innerHTML = `
+    <div class="row"><strong>${user.displayName || '(sin nombre)'}</strong><span class="small">${user.email}</span></div>
+    <div class="small">Verificado: ${user.emailVerified ? 'Sí' : 'No'}</div>
+  `;
+  list.appendChild(d);
+};
 
 const slideshowIds = ['amazon','psn','google','xbox','spotify','netflix','disney','steam'];
 let slideIndex = 0; let slideTimer = null;
@@ -478,7 +479,12 @@ function slidePrev(){ slideIndex = (slideIndex-1+slideshowIds.length)%slideshowI
 function iniciarAutoSlide(){ detenerAutoSlide(); slideTimer = setInterval(slideNext, 3000); }
 function detenerAutoSlide(){ if(slideTimer) clearInterval(slideTimer); slideTimer = null; }
 
-function initSlideshow(){
+window.onload = () => {
+  actualizarUIAuth();
+  renderGiftCards();
+  actualizarCarritoListado();
+  pintarDatosBanco('Cuscatlán');
+
   const dotsWrap = document.getElementById('slide-dots');
   dotsWrap.innerHTML = '';
   slideshowIds.forEach((_,i)=>{
@@ -486,7 +492,6 @@ function initSlideshow(){
     b.addEventListener('click', ()=>{ slideIndex=i; pintarSlide(slideIndex); iniciarAutoSlide(); });
     dotsWrap.appendChild(b);
   });
-
   document.getElementById('slide-next').addEventListener('click', ()=>{ slideNext(); iniciarAutoSlide(); });
   document.getElementById('slide-prev').addEventListener('click', ()=>{ slidePrev(); iniciarAutoSlide(); });
 
@@ -496,20 +501,4 @@ function initSlideshow(){
 
   pintarSlide(slideIndex);
   iniciarAutoSlide();
-}
-
-window.onload = () => {
-  actualizarUIAuth();
-  initSlideshow();
-  renderGiftCards();
-  actualizarCarritoListado();
-
-  const payRadio = [...document.querySelectorAll('input[name="paymethod"]')].find(r=>r.checked);
-  if (payRadio && payRadio.value === 'transfer') {
-    const form = document.getElementById('transfer-form');
-    if (form) {
-      form.style.display = 'block';
-      actualizarDatosBanco();
-    }
-  }
 };
