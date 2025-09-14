@@ -182,5 +182,109 @@
   </div>
 
   <script src="js/main.js"></script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+    import { 
+      getAuth, 
+      createUserWithEmailAndPassword, 
+      signInWithEmailAndPassword, 
+      sendEmailVerification, 
+      signOut, 
+      onAuthStateChanged 
+    } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBbx5r5avAQBWqCmRcLdh4vFmlGimio4",
+      authDomain: "tati-shop-73291.firebaseapp.com",
+      projectId: "tati-shop-73291",
+      storageBucket: "tati-shop-73291.appspot.com",
+      messagingSenderId: "160273697599",
+      appId: "1:160273697599:web:8c256cf50bd051d4b4f00a",
+      measurementId: "G-QQJE1I8S9L"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    console.log("✅ Firebase inicializado correctamente");
+
+    async function registrar() {
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim().toLowerCase();
+      const pass = document.getElementById('reg-pass').value;
+
+      if (!name || !email || !pass) {
+        alert("Completa todos los campos");
+        return;
+      }
+
+      try {
+        const userCred = await createUserWithEmailAndPassword(auth, email, pass);
+        await sendEmailVerification(userCred.user);
+        alert("✅ Cuenta creada. Revisa tu correo para verificarla.");
+      } catch (err) {
+        alert("❌ Error al registrar: " + err.message);
+      }
+    }
+
+    async function login() {
+      const email = document.getElementById('login-email').value.trim().toLowerCase();
+      const pass = document.getElementById('login-pass').value;
+
+      if (!email || !pass) {
+        alert("Completa email y contraseña");
+        return;
+      }
+
+      try {
+        const userCred = await signInWithEmailAndPassword(auth, email, pass);
+        if (!userCred.user.emailVerified) {
+          alert("⚠️ Verifica tu correo antes de iniciar sesión.");
+          await signOut(auth);
+          return;
+        }
+        alert("✅ Sesión iniciada.");
+      } catch (err) {
+        alert("❌ Error al iniciar sesión: " + err.message);
+      }
+    }
+
+    async function logout() {
+      await signOut(auth);
+      alert("👋 Sesión cerrada.");
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      const authBtn = document.getElementById("auth-btn");
+      const adminOpen = document.getElementById("admin-open");
+      const adminEmail = "ventas-online@tati-shop.com"; // admin fijo
+
+      if (user) {
+        const email = user.email || "";
+        const verified = user.emailVerified;
+
+        if (!verified) {
+          authBtn.textContent = "⚠️ Verifica tu correo";
+          authBtn.onclick = () => alert("Revisa tu email y verifica tu cuenta.");
+          adminOpen.style.display = "none";
+          document.getElementById('admin-session-email').textContent = "-";
+        } else {
+          authBtn.textContent = `👤 ${email}`;
+          authBtn.onclick = () => { if(confirm("¿Cerrar sesión?")) logout(); };
+          adminOpen.style.display = (email.toLowerCase() === adminEmail) ? "inline-block" : "none";
+          document.getElementById('admin-session-email').textContent = email;
+        }
+      } else {
+        authBtn.textContent = "👤 Acceder";
+        authBtn.onclick = () => abrirAuth();
+        adminOpen.style.display = "none";
+        document.getElementById('admin-session-email').textContent = "-";
+      }
+    });
+
+    window.registrar = registrar;
+    window.login = login;
+    window.logout = logout;
+  </script>
 </body>
 </html>
