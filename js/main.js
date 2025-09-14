@@ -1,25 +1,55 @@
-// ===== Config =====
+/* ===== Config ===== */
 const IVA = 0.07;
 const WSP_NUM = '50379553318';
 const SOPORTE_MAIL = 'ventas-online@tati-shop.com';
 const ADMIN_EMAIL = SOPORTE_MAIL;
 const ADMIN_PIN = '8642';
 const LS_ORDERS = 'tati_orders';
-
 const money = n => `$${Number(n).toFixed(2)}`;
 const getOrders = () => JSON.parse(localStorage.getItem(LS_ORDERS) || '[]');
 const setOrders = v  => localStorage.setItem(LS_ORDERS, JSON.stringify(v));
 
-// ===== Supabase =====
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+/* ===== Supabase (carga segura) =====
+   Si no pones tus claves, el sitio funciona en “modo offline”
+   y NO rompe el render del carrusel ni la grilla. */
+const SUPABASE_URL = '';            // <-- pon tu URL si lo usarás
+const SUPABASE_ANON_KEY = '';       // <-- pon tu ANON KEY si lo usarás
+let supabase = null;
 
-const SUPABASE_URL = 'https://YOUR-PROJECT-URL.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR-ANON-KEY';
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
-});
+async function initAuth() {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    // modo offline “fake auth”
+    supabase = {
+      auth: {
+        getUser: async () => ({ data: { user: null } }),
+        signUp: async () => ({ error: { message: 'Auth no configurado' } }),
+        signInWithPassword: async () => ({ error: { message: 'Auth no configurado' } }),
+        signOut: async () => ({}),
+        onAuthStateChange: () => ({ data: { subscription: { unsubscribe(){} } } })
+      }
+    };
+    return;
+  }
+  try {
+    const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
+    supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+    });
+  } catch (e) {
+    // si falla el import, entra modo offline
+    supabase = {
+      auth: {
+        getUser: async () => ({ data: { user: null } }),
+        signUp: async () => ({ error: { message: 'No se pudo cargar Auth' } }),
+        signInWithPassword: async () => ({ error: { message: 'No se pudo cargar Auth' } }),
+        signOut: async () => ({}),
+        onAuthStateChange: () => ({ data: { subscription: { unsubscribe(){} } } })
+      }
+    };
+  }
+}
 
-// ===== Catálogo =====
+/* ===== Catálogo ===== */
 const giftcards = [
   { id: 'amazon', nombre: 'Amazon', montos: [10, 25, 50, 100], logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg' },
   { id: 'google', nombre: 'Google Play', montos: [10, 15, 25, 50, 100], logo: 'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Google-Play.webp' },
@@ -50,7 +80,7 @@ const giftcards = [
   { id: 'roblox', nombre: 'Roblox', montos: [10, 25], logo: 'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Roblox.png' },
   { id: 'visa', nombre: 'Visa Prepaid', montos: [25, 50, 100], logo: 'https://cdn.coinsbee.com/version2/dist/assets/img/brands/My-Prepaid-Center-VISA.png' },
   { id: 'mastercard', nombre: 'MasterCard Prepaid', montos: [25, 50, 100], logo: 'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Mastercard-by-Rewarble.png' }
-};
+];
 
 const descripciones = {
   amazon:  "Compra millones de productos en Amazon desde cualquier lugar.",
@@ -62,7 +92,6 @@ const descripciones = {
   disney:  "Disney, Pixar, Marvel y Star Wars en una sola app.",
   steam:   "Tu biblioteca de videojuegos para PC en Steam."
 };
-
 const brandBg = {
   amazon:  ['#232F3E', '#FF9900'],
   psn:     ['#003791', '#0a5bd7'],
@@ -74,9 +103,8 @@ const brandBg = {
   steam:   ['#151A21', '#2A475E']
 };
 
-// ===== Carrito =====
+/* ===== Carrito ===== */
 let carrito = [];
-
 function renderGiftCards() {
   const container = document.getElementById('giftcards-grid');
   container.innerHTML = '';
@@ -111,7 +139,6 @@ function agruparCarrito(items) {
   });
   return Array.from(map.values());
 }
-
 function actualizarCarritoListado() {
   const cart = document.getElementById('cart-items');
   const count = document.getElementById('cart-count');
@@ -144,12 +171,11 @@ function actualizarCarritoListado() {
     <p><strong>Total a pagar:</strong> ${money(total)}</p>
   `;
 }
-
 window.vaciarCarrito  = () => { carrito = []; actualizarCarritoListado(); };
 window.abrirCarrito   = () => { document.getElementById('carrito-modal').style.display='flex'; };
 window.cerrarCarrito  = () => { document.getElementById('carrito-modal').style.display='none'; };
 
-// ===== Pago =====
+/* ===== Pago ===== */
 function buildOrderSummary() {
   const agrupado = agruparCarrito(carrito);
   let subtotalSinIva = 0;
@@ -162,14 +188,16 @@ function buildOrderSummary() {
   const total = subtotalSinIva + iva;
   return { lines, subtotalSinIva, iva, total, items: agrupado };
 }
-
-function crearPedido(meta) {
+async function crearPedido(meta) {
   const { lines, subtotalSinIva, iva, total, items } = buildOrderSummary();
-  const userEmail = supabase.auth.getUser().then(r => r.data.user?.email).catch(()=>null);
-
+  let email = 'invitado';
+  try {
+    const { data } = await supabase.auth.getUser();
+    email = data?.user?.email || 'invitado';
+  } catch(_) {}
   const order = {
     id: 'PED-' + Date.now(),
-    userEmail, // se resuelve abajo al guardar
+    userEmail: email,
     items,
     subtotal: subtotalSinIva,
     iva,
@@ -180,16 +208,9 @@ function crearPedido(meta) {
     nota: meta.nota || '',
     creadoEn: new Date().toISOString()
   };
-
-  return supabase.auth.getUser().then(({ data }) => {
-    order.userEmail = data.user?.email || 'invitado';
-    const orders = getOrders();
-    orders.unshift(order);
-    setOrders(orders);
-    return order;
-  });
+  const orders = getOrders(); orders.unshift(order); setOrders(orders);
+  return order;
 }
-
 function pagarWhatsAppFlow(nota) {
   crearPedido({ metodo: 'whatsapp', nota }).then(order => {
     const { lines, subtotalSinIva, iva, total } = buildOrderSummary();
@@ -200,14 +221,12 @@ function pagarWhatsAppFlow(nota) {
     window.open(url, '_blank');
   });
 }
-
 function pagarTransferFlow(nota) {
   const banco = document.getElementById('transfer-bank').value;
   crearPedido({ metodo:'transfer', banco, nota }).then(order=>{
     alert(`Pedido creado (${order.id}). Banco seleccionado: ${banco}. Envía tu comprobante por WhatsApp para verificarlo.`);
   });
 }
-
 window.procesarPago = () => {
   if (carrito.length === 0) { alert('Tu carrito está vacío.'); return; }
   const metodo = [...document.querySelectorAll('input[name="paymethod"]')].find(r=>r.checked)?.value || 'whatsapp';
@@ -216,7 +235,7 @@ window.procesarPago = () => {
   else pagarWhatsAppFlow(nota);
 };
 
-// ===== Bancos =====
+/* ===== Bancos ===== */
 const cuentasBancarias = {
   'Cuscatlán': {
     beneficiario: 'MARGARITA CASTRO',
@@ -249,7 +268,7 @@ document.addEventListener('change', (e)=>{
   if(e.target.id==='transfer-bank'){ pintarDatosBanco(e.target.value); }
 });
 
-// ===== Contacto =====
+/* ===== Contacto ===== */
 window.abrirContacto  = () => { document.getElementById('contacto-modal').style.display='flex'; };
 window.cerrarContacto = () => { document.getElementById('contacto-modal').style.display='none'; };
 window.enviarWhatsAppContacto = () => {
@@ -258,10 +277,9 @@ window.enviarWhatsAppContacto = () => {
   window.open(url,'_blank');
 };
 
-// ===== Auth (Supabase) =====
+/* ===== Auth (funciona, pero no rompe si no hay claves) ===== */
 window.abrirAuth  = () => { document.getElementById('auth-modal').style.display='flex'; };
 window.cerrarAuth = () => { document.getElementById('auth-modal').style.display='none'; };
-
 window.mostrarLogin = () => {
   document.getElementById('tab-login').classList.add('active');
   document.getElementById('tab-register').classList.remove('active');
@@ -274,31 +292,26 @@ window.mostrarRegistro = () => {
   document.getElementById('register-form').style.display='grid';
   document.getElementById('login-form').style.display='none';
 };
-
 window.registrar = async () => {
   const name = document.getElementById('reg-name').value.trim();
   const email = document.getElementById('reg-email').value.trim().toLowerCase();
   const pass = document.getElementById('reg-pass').value;
   if(!name || !email || !pass){ alert('Completa todos los campos'); return; }
-
   const { error } = await supabase.auth.signUp({
     email, password: pass,
     options: { data: { name }, emailRedirectTo: window.location.origin }
   });
   if(error){ alert('Error al registrar: ' + error.message); return; }
-  alert('Cuenta creada. Revisa tu correo y verifica tu email para poder iniciar sesión.');
+  alert('Cuenta creada. Revisa tu correo para verificarla.');
   cerrarAuth();
 };
-
 window.login = async () => {
   const email = document.getElementById('login-email').value.trim().toLowerCase();
   const pass  = document.getElementById('login-pass').value;
   if(!email || !pass){ alert('Completa email y contraseña'); return; }
-
   const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
   if(error){ alert('Error al iniciar sesión: ' + error.message); return; }
-
-  if(!data.user?.email_confirmed_at){
+  if(data?.user && !data.user.email_confirmed_at){
     alert('Debes verificar tu correo antes de continuar.');
     await supabase.auth.signOut();
     return;
@@ -307,26 +320,19 @@ window.login = async () => {
   cerrarAuth();
   alert('Sesión iniciada.');
 };
-
 window.logout = async () => {
   await supabase.auth.signOut();
   actualizarUIAuth();
   alert('Sesión cerrada.');
 };
-
 window.adminAccesoRapido = () => {
   const pin = prompt('PIN admin:');
-  if(pin === ADMIN_PIN){
-    alert('Acceso admin temporal.');
-    abrirAdmin();
-  }else{
-    alert('PIN incorrecto');
-  }
+  if(pin === ADMIN_PIN){ abrirAdmin(); }
+  else alert('PIN incorrecto');
 };
-
 async function actualizarUIAuth(){
-  const { data } = await supabase.auth.getUser();
-  const user = data.user;
+  let user = null;
+  try { const { data } = await supabase.auth.getUser(); user = data?.user || null; } catch(_){}
   const authBtn  = document.getElementById('auth-btn');
   const adminBtn = document.getElementById('admin-open');
 
@@ -335,8 +341,7 @@ async function actualizarUIAuth(){
     authBtn.textContent = `👤 ${nombre}`;
     authBtn.onclick = () => { if(confirm('¿Cerrar sesión?')) logout(); };
     adminBtn.style.display = (user.email === ADMIN_EMAIL) ? 'inline-block' : 'none';
-    const span = document.getElementById('admin-session-email');
-    if (span) span.textContent = user.email;
+    const span = document.getElementById('admin-session-email'); if (span) span.textContent = user.email;
   }else{
     authBtn.textContent = '👤 Acceder';
     authBtn.onclick = abrirAuth;
@@ -344,27 +349,24 @@ async function actualizarUIAuth(){
   }
 }
 
-// ===== Admin (local) =====
+/* ===== Admin (local) ===== */
 window.abrirAdmin = async () => {
-  const { data } = await supabase.auth.getUser();
-  const user = data.user;
-  if(!(user && user.email_confirmed_at && user.email === ADMIN_EMAIL)){
+  let email = null, verified = false;
+  try { const { data } = await supabase.auth.getUser(); email = data?.user?.email; verified = !!data?.user?.email_confirmed_at; } catch(_){}
+  if(!(verified && email === ADMIN_EMAIL)){
     if(!confirm('No eres admin verificado. Vista local. ¿Continuar?')) return;
   }
   document.getElementById('admin-modal').style.display='flex';
   renderPedidos(); renderUsuarios();
 };
 window.cerrarAdmin = () => { document.getElementById('admin-modal').style.display='none'; };
-
 window.renderPedidos = () => {
   const list = document.getElementById('orders-list');
   const filter = document.getElementById('orders-filter')?.value || 'ALL';
   const orders = getOrders();
   const filtered = filter==='ALL' ? orders : orders.filter(o=>o.estado===filter);
-
   list.innerHTML = '';
   if(filtered.length===0){ list.innerHTML = '<p class="small">No hay pedidos.</p>'; return; }
-
   filtered.forEach(o=>{
     const div = document.createElement('div');
     div.className = 'order';
@@ -388,16 +390,11 @@ window.renderPedidos = () => {
 window.cambiarEstado = (id, estado) => {
   const orders = getOrders();
   const idx = orders.findIndex(o=>o.id===id);
-  if(idx>-1){
-    orders[idx].estado = estado;
-    setOrders(orders);
-    renderPedidos();
-  }
+  if(idx>-1){ orders[idx].estado = estado; setOrders(orders); renderPedidos(); }
 };
 window.enviarWhatsDePedido = (id) => {
   const orders = getOrders();
-  const o = orders.find(x=>x.id===id);
-  if(!o) return;
+  const o = orders.find(x=>x.id===id); if(!o) return;
   const lines = o.items.map(it => `• ${it.nombre} — ${it.cantidad} × ${money(it.precio)} = ${money(it.precio*it.cantidad)}`);
   let msg = `*Pedido Tati Shop – ${id}*\nCliente: ${o.userEmail}\n\n*Artículos:*\n${lines.join('\n')}\n\n*Subtotal:* ${money(o.subtotal)}\n*IVA:* ${money(o.iva)}\n*Total:* ${money(o.total)}\n*Estado:* ${o.estado}\n*Método:* ${o.metodo}${o.banco?(' ('+o.banco+')'):''}`;
   const url = `https://wa.me/${WSP_NUM}?text=${encodeURIComponent(msg)}`;
@@ -405,8 +402,7 @@ window.enviarWhatsDePedido = (id) => {
 };
 window.renderUsuarios = async () => {
   const list = document.getElementById('users-list');
-  const { data } = await supabase.auth.getUser();
-  const user = data.user;
+  let user = null; try { const { data } = await supabase.auth.getUser(); user = data?.user; } catch(_){}
   list.innerHTML = '';
   if(!user){ list.innerHTML = '<p class="small">Sin sesión activa.</p>'; return; }
   const d = document.createElement('div');
@@ -418,10 +414,9 @@ window.renderUsuarios = async () => {
   list.appendChild(d);
 };
 
-// ===== Slideshow =====
+/* ===== Slideshow ===== */
 const slideshowIds = ['amazon','psn','google','xbox','spotify','netflix','disney','steam'];
 let slideIndex = 0; let slideTimer = null;
-
 function setSlideBackground(id){
   const [c1,c2] = brandBg[id] || ['#ff9ec1','#ff5d96'];
   const bg = document.getElementById('slide-bg');
@@ -452,13 +447,16 @@ function slidePrev(){ slideIndex = (slideIndex-1+slideshowIds.length)%slideshowI
 function iniciarAutoSlide(){ detenerAutoSlide(); slideTimer = setInterval(slideNext, 3000); }
 function detenerAutoSlide(){ if(slideTimer) clearInterval(slideTimer); slideTimer = null; }
 
-// ===== Init =====
+/* ===== Init ===== */
 window.onload = async () => {
-  await actualizarUIAuth();
-  renderGiftCards();
-  actualizarCarritoListado();
-  pintarDatosBanco('Cuscatlán');
+  await initAuth();                // prepara Auth sin romper UI
+  await actualizarUIAuth();        // pinta botón Acceder/admin según estado
 
+  renderGiftCards();               // pinta grilla SÍ o SÍ
+  actualizarCarritoListado();
+  pintarDatosBanco('Cuscatlán');   // default
+
+  // Slideshow
   const dotsWrap = document.getElementById('slide-dots');
   dotsWrap.innerHTML = '';
   slideshowIds.forEach((_,i)=>{
@@ -468,13 +466,11 @@ window.onload = async () => {
   });
   document.getElementById('slide-next').addEventListener('click', ()=>{ slideNext(); iniciarAutoSlide(); });
   document.getElementById('slide-prev').addEventListener('click', ()=>{ slidePrev(); iniciarAutoSlide(); });
-
   const ss = document.getElementById('slideshow');
   ss.addEventListener('mouseenter', detenerAutoSlide);
   ss.addEventListener('mouseleave', iniciarAutoSlide);
-
   pintarSlide(slideIndex);
   iniciarAutoSlide();
 
-  supabase.auth.onAuthStateChange(() => actualizarUIAuth());
+  try { supabase.auth.onAuthStateChange(() => actualizarUIAuth()); } catch(_){}
 };
