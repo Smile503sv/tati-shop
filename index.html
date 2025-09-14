@@ -46,7 +46,6 @@
     <a href="mailto:ventas-online@tati-shop.com">ventas-online@tati-shop.com</a>
   </footer>
 
-  <!-- Carrito -->
   <div class="modal" id="carrito-modal">
     <div class="modal-content">
       <span class="close" onclick="cerrarCarrito()">&times;</span>
@@ -56,10 +55,12 @@
 
       <div class="checkout-box">
         <h3>💳 Método de pago</h3>
+
         <label class="pay-option">
           <input type="radio" name="paymethod" value="whatsapp" checked>
           <span>💬 Pagar por WhatsApp</span>
         </label>
+
         <label class="pay-option">
           <input type="radio" name="paymethod" value="transfer">
           <span>🏦 Transfer365 (Cuscatlán / Agrícola)</span>
@@ -71,10 +72,12 @@
             <option value="Cuscatlán">Banco Cuscatlán</option>
             <option value="Agrícola">Banco Agrícola</option>
           </select>
+
           <div class="bank-instructions">
             <p><strong>Datos para Transfer365:</strong></p>
-            <ul id="bank-lines"></ul>
-            <p>💡 Tras realizar la transferencia, envía el comprobante al WhatsApp para verificar y aprobar tu pedido.</p>
+            <ul id="bank-data">
+            </ul>
+            <p>Tras realizar la transferencia, envía el comprobante al WhatsApp para verificar y aprobar tu pedido.</p>
           </div>
         </div>
       </div>
@@ -93,25 +96,22 @@
     </div>
   </div>
 
-  <!-- Contacto -->
   <div class="modal" id="contacto-modal">
     <div class="modal-content">
       <span class="close" onclick="cerrarContacto()">&times;</span>
       <h2>📞 Contáctanos</h2>
-      <p>Soporte por correo y WhatsApp:</p>
       <ul class="contact-list">
         <li>📧 <a href="mailto:ventas-online@tati-shop.com">ventas-online@tati-shop.com</a></li>
         <li>💬 <a href="https://wa.me/50379553318" target="_blank" rel="noopener">WhatsApp: +503 7955 3318</a></li>
       </ul>
       <div class="quick-message">
         <label for="contact-msg">Mensaje rápido (opcional):</label>
-        <textarea id="contact-msg" placeholder="Escribe tu consulta y te llevamos a WhatsApp con este texto..."></textarea>
+        <textarea id="contact-msg" placeholder="Escribe tu consulta…"></textarea>
         <button class="pagar-wsp-btn" onclick="enviarWhatsAppContacto()">Enviar a WhatsApp</button>
       </div>
     </div>
   </div>
 
-  <!-- Auth -->
   <div class="modal" id="auth-modal">
     <div class="modal-content auth">
       <span class="close" onclick="cerrarAuth()">&times;</span>
@@ -119,6 +119,7 @@
         <button id="tab-login" class="active" onclick="mostrarLogin()">Iniciar Sesión</button>
         <button id="tab-register" onclick="mostrarRegistro()">Registrarse</button>
       </div>
+
       <div id="login-form" class="auth-pane">
         <label>Email</label>
         <input type="email" id="login-email" placeholder="tu@email.com">
@@ -129,6 +130,7 @@
           <button class="secundario-btn" onclick="adminAccesoRapido()">🔐 Acceso rápido Admin</button>
         </div>
       </div>
+
       <div id="register-form" class="auth-pane" style="display:none;">
         <label>Nombre</label>
         <input type="text" id="reg-name" placeholder="Tu nombre">
@@ -141,7 +143,6 @@
     </div>
   </div>
 
-  <!-- Admin -->
   <div class="modal" id="admin-modal">
     <div class="modal-content admin">
       <span class="close" onclick="cerrarAdmin()">&times;</span>
@@ -149,7 +150,9 @@
 
       <div class="admin-header">
         <div><strong>Sesión:</strong> <span id="admin-session-email">-</span></div>
-        <div class="admin-actions"><button class="secundario-btn" onclick="logout()">Cerrar sesión</button></div>
+        <div class="admin-actions">
+          <button class="secundario-btn" onclick="logout()">Cerrar sesión</button>
+        </div>
       </div>
 
       <div class="admin-panels">
@@ -176,7 +179,7 @@
     </div>
   </div>
 
-  <!-- App -->
-  <script type="module" src="js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>
