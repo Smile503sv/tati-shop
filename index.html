@@ -5,11 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Gift Cards | Tati Shop</title>
   <link rel="stylesheet" href="css/style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <div class="toast-container" id="toast-container"></div>
-
   <header class="main-header">
     <div class="top-bar">
       <img src="img/logo.svg" alt="Tati Shop Logo" class="logo-left" />
@@ -17,10 +15,11 @@
         <button class="secundario-btn" onclick="abrirContacto()">📞 Contacto</button>
         <button class="secundario-btn" id="auth-btn" onclick="abrirAuth()">👤 Acceder</button>
         <button class="secundario-btn" id="admin-open" onclick="abrirAdmin()" style="display:none;">🛠️ Admin</button>
-        <button class="carrito-btn" onclick="abrirCarrito()">
-          🛒 Ver Carrito 
-          <span class="cart-badge" id="cart-count">0</span>
-        </button>
+        <button class="carrito-btn" onclick="abrirCarrito()">🛒 Ver Carrito (<span id="cart-count">0</span>)</button>
+      </div>
+    </div>
+    <div class="header-content">
+      <h1>🎁 Gift Cards Tati Shop</h1>
       <p>Elige, regala, sorprende — digital y al instante</p>
     </div>
   </header>
@@ -37,33 +36,6 @@
     <div class="slide-dots" id="slide-dots"></div>
   </section>
 
-  <section class="search-filters">
-    <div class="search-box">
-      <input type="text" id="search-input" placeholder="Buscar gift cards..." />
-    </div>
-    <div class="filter-group">
-      <select class="filter-select" id="category-filter">
-        <option value="">Todas las categorías</option>
-        <option value="gaming">Gaming</option>
-        <option value="streaming">Streaming</option>
-        <option value="shopping">Shopping</option>
-        <option value="food">Comida</option>
-        <option value="tech">Tecnología</option>
-      </select>
-      <select class="filter-select" id="price-filter">
-        <option value="">Todos los precios</option>
-        <option value="0-25">$0 - $25</option>
-        <option value="25-50">$25 - $50</option>
-        <option value="50-100">$50 - $100</option>
-        <option value="100+">$100+</option>
-      </select>
-      <button class="favorites-toggle" id="favorites-toggle">
-        <span>❤️</span>
-        <span>Solo favoritos</span>
-      </button>
-    </div>
-  </section>
-
   <main>
     <div class="grid" id="giftcards-grid"></div>
   </main>
@@ -73,6 +45,7 @@
     <a href="mailto:ventas-online@tati-shop.com">ventas-online@tati-shop.com</a>
   </footer>
 
+  <!-- Carrito -->
   <div class="modal" id="carrito-modal">
     <div class="modal-content">
       <span class="close" onclick="cerrarCarrito()">&times;</span>
@@ -100,6 +73,7 @@
           <div class="bank-instructions">
             <p><strong>Datos para Transferencia:</strong></p>
             <ul id="bank-data">
+              <!-- se rellena por JS según el banco -->
             </ul>
             <p>Al finalizar, envía el comprobante por WhatsApp para verificar y aprobar tu pedido.</p>
           </div>
@@ -120,6 +94,7 @@
     </div>
   </div>
 
+  <!-- Contacto -->
   <div class="modal" id="contacto-modal">
     <div class="modal-content">
       <span class="close" onclick="cerrarContacto()">&times;</span>
@@ -136,6 +111,7 @@
     </div>
   </div>
 
+  <!-- Auth -->
   <div class="modal" id="auth-modal">
     <div class="modal-content auth">
       <span class="close" onclick="cerrarAuth()">&times;</span>
@@ -144,33 +120,28 @@
         <button id="tab-register" onclick="mostrarRegistro()">Registrarse</button>
       </div>
       <div id="login-form" class="auth-pane">
-        <div class="form-group">
-          <label class="form-label" for="login-email">Correo electrónico</label>
-          <input class="form-input" type="email" id="login-email" placeholder="tu@email.com">
-          <div class="form-error" id="login-email-error" style="display: none;"></div>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="login-pass">Contraseña</label>
-          <input class="form-input" type="password" id="login-pass" placeholder="Tu contraseña">
-          <div class="form-error" id="login-password-error" style="display: none;"></div>
-        </div>
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="tu@email.com">
+        <label>Contraseña</label>
+        <input type="password" id="login-pass" placeholder="********">
         <button class="pagar-wsp-btn" onclick="login()">Entrar</button>
         <div class="admin-quick">
           <button class="secundario-btn" onclick="adminAccesoRapido()">🔐 Acceso rápido Admin</button>
         </div>
       </div>
       <div id="register-form" class="auth-pane" style="display:none;">
-        <label for="reg-name">Nombre</label>
+        <label>Nombre</label>
         <input type="text" id="reg-name" placeholder="Tu nombre">
-        <label for="reg-email">Email</label>
+        <label>Email</label>
         <input type="email" id="reg-email" placeholder="tu@email.com">
-        <label for="reg-pass">Contraseña</label>
+        <label>Contraseña</label>
         <input type="password" id="reg-pass" placeholder="********">
         <button class="pagar-wsp-btn" onclick="registrar()">Crear cuenta</button>
       </div>
     </div>
   </div>
 
+  <!-- Admin (local) -->
   <div class="modal" id="admin-modal">
     <div class="modal-content admin">
       <span class="close" onclick="cerrarAdmin()">&times;</span>
