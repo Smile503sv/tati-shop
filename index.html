@@ -4,10 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Gift Cards | Tati Shop</title>
+  <meta name="description" content="Compra gift cards digitales de forma rápida, segura y al instante. Tati Shop te ofrece las mejores marcas para regalar.">
+  <meta name="keywords" content="gift cards, tati shop, tarjetas regalo, digitales, comprar online">
+  <meta name="author" content="Tati Shop" />
   <link rel="stylesheet" href="css/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
 </head>
 <body>
+
+  <!-- Header -->
   <header class="main-header">
     <div class="top-bar">
       <img src="img/logo.svg" alt="Tati Shop Logo" class="logo-left" />
@@ -24,6 +29,7 @@
     </div>
   </header>
 
+  <!-- Slideshow -->
   <section class="slideshow-section">
     <div class="slideshow" id="slideshow">
       <button class="slide-btn prev" id="slide-prev" aria-label="Anterior">&#10094;</button>
@@ -36,16 +42,20 @@
     <div class="slide-dots" id="slide-dots"></div>
   </section>
 
+  <!-- Productos -->
   <main>
     <div class="grid" id="giftcards-grid"></div>
   </main>
 
+  <!-- Footer -->
   <footer>
     © 2025 Tati Shop · Soporte:
     <a href="mailto:ventas-online@tati-shop.com">ventas-online@tati-shop.com</a>
   </footer>
 
-  <!-- Carrito -->
+  <!-- MODALES -->
+
+  <!-- 🛒 Carrito -->
   <div class="modal" id="carrito-modal">
     <div class="modal-content">
       <span class="close" onclick="cerrarCarrito()">&times;</span>
@@ -73,9 +83,9 @@
           <div class="bank-instructions">
             <p><strong>Datos para Transferencia:</strong></p>
             <ul id="bank-data">
-              <!-- se rellena por JS según el banco -->
+              <!-- contenido dinámico -->
             </ul>
-            <p>Al finalizar, envía el comprobante por WhatsApp para verificar y aprobar tu pedido.</p>
+            <p>Al finalizar, envía el comprobante por WhatsApp para verificar tu pedido.</p>
           </div>
         </div>
       </div>
@@ -94,7 +104,7 @@
     </div>
   </div>
 
-  <!-- Contacto -->
+  <!-- 📞 Contacto -->
   <div class="modal" id="contacto-modal">
     <div class="modal-content">
       <span class="close" onclick="cerrarContacto()">&times;</span>
@@ -111,7 +121,7 @@
     </div>
   </div>
 
-  <!-- Auth -->
+  <!-- 👤 Auth -->
   <div class="modal" id="auth-modal">
     <div class="modal-content auth">
       <span class="close" onclick="cerrarAuth()">&times;</span>
@@ -141,7 +151,7 @@
     </div>
   </div>
 
-  <!-- Admin (local) -->
+  <!-- 🛠️ Admin -->
   <div class="modal" id="admin-modal">
     <div class="modal-content admin">
       <span class="close" onclick="cerrarAdmin()">&times;</span>
@@ -149,7 +159,9 @@
 
       <div class="admin-header">
         <div><strong>Sesión:</strong> <span id="admin-session-email">-</span></div>
-        <div class="admin-actions"><button class="secundario-btn" onclick="logout()">Cerrar sesión</button></div>
+        <div class="admin-actions">
+          <button class="secundario-btn" onclick="logout()">Cerrar sesión</button>
+        </div>
       </div>
 
       <div class="admin-panels">
@@ -176,6 +188,7 @@
     </div>
   </div>
 
+  <!-- Script principal -->
   <script src="js/main.js"></script>
 </body>
 </html>
