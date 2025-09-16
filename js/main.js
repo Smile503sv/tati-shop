@@ -188,14 +188,40 @@ function pagarWhatsAppFlow(nota){
 function pagarTransferFlow(nota){
   const banco = document.getElementById('transfer-bank').value;
   crearPedido({metodo:'transfer', banco, nota});
-  alert(`Pedido creado. Banco: ${banco}. Envía tu comprobante por WhatsApp para verificarlo.`);
+  showNotification(`Pedido creado para ${banco}. Envía tu comprobante por WhatsApp para verificarlo.`, 'info', 6000);
 }
 
 function procesarPago(){
-  if(!carrito.length){ alert('Tu carrito está vacío.'); return; }
+  if(!carrito.length){ 
+    showNotification('Tu carrito está vacío', 'warning');
+    return; 
+  }
   const metodo = [...document.querySelectorAll('input[name="paymethod"]')].find(r=>r.checked)?.value || 'whatsapp';
   const nota = (document.getElementById('buyer-note')?.value || '').trim();
-  if(metodo==='transfer') pagarTransferFlow(nota); else pagarWhatsAppFlow(nota);
+  
+  // Mostrar loading
+  const payBtn = document.getElementById('pay-btn');
+  const originalText = payBtn.innerHTML;
+  payBtn.innerHTML = '<div class="spinner"></div>';
+  payBtn.disabled = true;
+  
+  setTimeout(() => {
+    if(metodo==='transfer') {
+      pagarTransferFlow(nota);
+    } else {
+      pagarWhatsAppFlow(nota);
+    }
+    
+    // Limpiar carrito después del pago
+    carrito = [];
+    actualizarCarritoListado();
+    cerrarCarrito();
+    
+    payBtn.innerHTML = originalText;
+    payBtn.disabled = false;
+    
+    showNotification('¡Pedido creado exitosamente!', 'success');
+  }, 1500);
 }
 
 document.addEventListener('change',e=>{
@@ -295,7 +321,10 @@ function adminAccesoRapido(){
   if(pin===ADMIN_PIN){
     setSess({ email: ADMIN_EMAIL, name:'Administrador', isAdmin:true });
     actualizarUIAuth(); cerrarAuth(); abrirAdmin();
-  }else alert('PIN incorrecto');
+    showNotification('Acceso de administrador concedido', 'success');
+  }else {
+    showNotification('PIN incorrecto', 'error');
+  }
 }
 
 function actualizarUIAuth(){
@@ -304,12 +333,18 @@ function actualizarUIAuth(){
   const adminBtn = document.getElementById('admin-open');
 
   if(sess){
-    btn.textContent = `👤 ${sess.name || sess.email}`;
-    btn.onclick = () => { if(confirm('¿Cerrar sesión?')) logout(); };
+    btn.innerHTML = `
+      <span>👤</span>
+      <span>${sess.name || sess.email}</span>
+      <span style="font-size: 0.8rem; opacity: 0.7;">▼</span>
+    `;
+    btn.onclick = () => { 
+      if(confirm('¿Cerrar sesión?')) logout(); 
+    };
     adminBtn.style.display = sess.isAdmin ? 'inline-block' : 'none';
     const span = document.getElementById('admin-session-email'); if(span) span.textContent = sess.email;
   }else{
-    btn.textContent = '👤 Acceder';
+    btn.innerHTML = '<span>👤</span><span>Acceder</span>';
     btn.onclick = abrirAuth;
     adminBtn.style.display = 'none';
   }
