@@ -5,9 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Gift Cards | Tati Shop</title>
   <link rel="stylesheet" href="css/style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
 </head>
 <body>
+  <div class="toast-container" id="toast-container"></div>
+
   <header class="main-header">
     <div class="top-bar">
       <img src="img/logo.svg" alt="Tati Shop Logo" class="logo-left" />
@@ -34,6 +36,33 @@
       <button class="slide-btn next" id="slide-next" aria-label="Siguiente">&#10095;</button>
     </div>
     <div class="slide-dots" id="slide-dots"></div>
+  </section>
+
+  <section class="search-filters">
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="Buscar gift cards..." />
+    </div>
+    <div class="filter-group">
+      <select class="filter-select" id="category-filter">
+        <option value="">Todas las categorías</option>
+        <option value="gaming">Gaming</option>
+        <option value="streaming">Streaming</option>
+        <option value="shopping">Shopping</option>
+        <option value="food">Comida</option>
+        <option value="tech">Tecnología</option>
+      </select>
+      <select class="filter-select" id="price-filter">
+        <option value="">Todos los precios</option>
+        <option value="0-25">$0 - $25</option>
+        <option value="25-50">$25 - $50</option>
+        <option value="50-100">$50 - $100</option>
+        <option value="100+">$100+</option>
+      </select>
+      <button class="favorites-toggle" id="favorites-toggle">
+        <span>❤️</span>
+        <span>Solo favoritos</span>
+      </button>
+    </div>
   </section>
 
   <main>
@@ -116,9 +145,9 @@
         <button id="tab-register" onclick="mostrarRegistro()">Registrarse</button>
       </div>
       <div id="login-form" class="auth-pane">
-        <label>Email</label>
+        <label for="login-email">Email</label>
         <input type="email" id="login-email" placeholder="tu@email.com">
-        <label>Contraseña</label>
+        <label for="login-pass">Contraseña</label>
         <input type="password" id="login-pass" placeholder="********">
         <button class="pagar-wsp-btn" onclick="login()">Entrar</button>
         <div class="admin-quick">
@@ -126,11 +155,11 @@
         </div>
       </div>
       <div id="register-form" class="auth-pane" style="display:none;">
-        <label>Nombre</label>
+        <label for="reg-name">Nombre</label>
         <input type="text" id="reg-name" placeholder="Tu nombre">
-        <label>Email</label>
+        <label for="reg-email">Email</label>
         <input type="email" id="reg-email" placeholder="tu@email.com">
-        <label>Contraseña</label>
+        <label for="reg-pass">Contraseña</label>
         <input type="password" id="reg-pass" placeholder="********">
         <button class="pagar-wsp-btn" onclick="registrar()">Crear cuenta</button>
       </div>
