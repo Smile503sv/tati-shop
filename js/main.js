@@ -1,3 +1,4 @@
+/* Config */
 const IVA = 0.07;
 const WSP_NUM = '50379553318';
 const SOPORTE_MAIL = 'ventas-online@tati-shop.com';
@@ -10,6 +11,7 @@ const LS_SESS   = 'tati_session';
 
 const money = n => `$${Number(n).toFixed(2)}`;
 
+/* Catálogo */
 const giftcards = [
   { id:'amazon', nombre:'Amazon', montos:[10,25,50,100], logo:'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg' },
   { id:'google', nombre:'Google Play', montos:[10,15,25,50,100], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Google-Play.webp' },
@@ -64,6 +66,7 @@ const brandBg = {
   steam:['#151A21','#2A475E']
 };
 
+/* LocalStorage helpers */
 const getUsers  = () => JSON.parse(localStorage.getItem(LS_USERS)  || '[]');
 const setUsers  = v  => localStorage.setItem(LS_USERS,  JSON.stringify(v));
 const getOrders = () => JSON.parse(localStorage.getItem(LS_ORDERS) || '[]');
@@ -72,6 +75,7 @@ const getSess   = () => JSON.parse(localStorage.getItem(LS_SESS)   || 'null');
 const setSess   = v  => localStorage.setItem(LS_SESS,   JSON.stringify(v));
 const clearSess = () => localStorage.removeItem(LS_SESS);
 
+/* Render productos */
 let carrito = [];
 
 function renderGiftCards(){
@@ -143,6 +147,7 @@ function vaciarCarrito(){ carrito=[]; actualizarCarritoListado(); }
 function abrirCarrito(){ document.getElementById('carrito-modal').style.display='flex'; }
 function cerrarCarrito(){ document.getElementById('carrito-modal').style.display='none'; }
 
+/* Pagos */
 function buildOrderSummary(){
   const items = agruparCarrito(carrito);
   let sub=0;
@@ -188,42 +193,17 @@ function pagarWhatsAppFlow(nota){
 function pagarTransferFlow(nota){
   const banco = document.getElementById('transfer-bank').value;
   crearPedido({metodo:'transfer', banco, nota});
-  showNotification(`Pedido creado para ${banco}. Envía tu comprobante por WhatsApp para verificarlo.`, 'info', 6000);
+  alert(`Pedido creado. Banco: ${banco}. Envía tu comprobante por WhatsApp para verificarlo.`);
 }
 
 function procesarPago(){
-  if(!carrito.length){ 
-    showNotification('Tu carrito está vacío', 'warning');
-    return; 
-  }
+  if(!carrito.length){ alert('Tu carrito está vacío.'); return; }
   const metodo = [...document.querySelectorAll('input[name="paymethod"]')].find(r=>r.checked)?.value || 'whatsapp';
   const nota = (document.getElementById('buyer-note')?.value || '').trim();
-  
-  // Mostrar loading
-  const payBtn = document.getElementById('pay-btn');
-  const originalText = payBtn.innerHTML;
-  payBtn.innerHTML = '<div class="spinner"></div>';
-  payBtn.disabled = true;
-  
-  setTimeout(() => {
-    if(metodo==='transfer') {
-      pagarTransferFlow(nota);
-    } else {
-      pagarWhatsAppFlow(nota);
-    }
-    
-    // Limpiar carrito después del pago
-    carrito = [];
-    actualizarCarritoListado();
-    cerrarCarrito();
-    
-    payBtn.innerHTML = originalText;
-    payBtn.disabled = false;
-    
-    showNotification('¡Pedido creado exitosamente!', 'success');
-  }, 1500);
+  if(metodo==='transfer') pagarTransferFlow(nota); else pagarWhatsAppFlow(nota);
 }
 
+/* Transferencia: selector de banco */
 document.addEventListener('change',e=>{
   if(e.target.name==='paymethod'){
     const show = e.target.value==='transfer';
@@ -250,6 +230,7 @@ document.addEventListener('change',e=>{
   }
 });
 
+/* Contacto */
 function abrirContacto(){ document.getElementById('contacto-modal').style.display='flex'; }
 function cerrarContacto(){ document.getElementById('contacto-modal').style.display='none'; }
 function enviarWhatsAppContacto(){
@@ -257,6 +238,7 @@ function enviarWhatsAppContacto(){
   window.open(`https://wa.me/${WSP_NUM}?text=${encodeURIComponent(t)}`,'_blank');
 }
 
+/* Auth local */
 async function hash(t){
   const enc = new TextEncoder().encode(t);
   const buf = await crypto.subtle.digest('SHA-256', enc);
@@ -321,10 +303,7 @@ function adminAccesoRapido(){
   if(pin===ADMIN_PIN){
     setSess({ email: ADMIN_EMAIL, name:'Administrador', isAdmin:true });
     actualizarUIAuth(); cerrarAuth(); abrirAdmin();
-    showNotification('Acceso de administrador concedido', 'success');
-  }else {
-    showNotification('PIN incorrecto', 'error');
-  }
+  }else alert('PIN incorrecto');
 }
 
 function actualizarUIAuth(){
@@ -333,23 +312,18 @@ function actualizarUIAuth(){
   const adminBtn = document.getElementById('admin-open');
 
   if(sess){
-    btn.innerHTML = `
-      <span>👤</span>
-      <span>${sess.name || sess.email}</span>
-      <span style="font-size: 0.8rem; opacity: 0.7;">▼</span>
-    `;
-    btn.onclick = () => { 
-      if(confirm('¿Cerrar sesión?')) logout(); 
-    };
+    btn.textContent = `👤 ${sess.name || sess.email}`;
+    btn.onclick = () => { if(confirm('¿Cerrar sesión?')) logout(); };
     adminBtn.style.display = sess.isAdmin ? 'inline-block' : 'none';
     const span = document.getElementById('admin-session-email'); if(span) span.textContent = sess.email;
   }else{
-    btn.innerHTML = '<span>👤</span><span>Acceder</span>';
+    btn.textContent = '👤 Acceder';
     btn.onclick = abrirAuth;
     adminBtn.style.display = 'none';
   }
 }
 
+/* Admin local */
 function abrirAdmin(){
   const s = getSess();
   if(!(s?.isAdmin)){ abrirAuth(); return; }
@@ -414,6 +388,7 @@ function renderUsuarios(){
   });
 }
 
+/* Carrusel */
 const slideshowIds = ['amazon','psn','google','xbox','spotify','netflix','disney','steam'];
 let slideIndex=0, slideTimer=null;
 
@@ -467,6 +442,7 @@ function initSlideshow(){
   iniciarAutoSlide();
 }
 
+/* Init */
 window.onload = ()=>{
   actualizarUIAuth();
   initSlideshow();
