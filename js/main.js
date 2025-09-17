@@ -12,7 +12,7 @@
 
   const money = n => `$${Number(n || 0).toFixed(2)}`;
   const nowISO = () => new Date().toISOString();
-  const safeId = p => `PED-${Date.now()}-${Math.random().toString(36).slice(2,7).toUpperCase()}`;
+  const safeId = () => `PED-${Date.now()}-${Math.random().toString(36).slice(2,7).toUpperCase()}`;
   const normEmail = e => (e || '').trim().toLowerCase();
 
   const giftcards = [
@@ -59,14 +59,10 @@
   };
 
   const brandBg = {
-    amazon:['#232F3E','#FF9900'],
-    psn:['#003791','#0a5bd7'],
-    google:['#4285F4','#34A853'],
-    xbox:['#107C10','#0B6B0B'],
-    spotify:['#1DB954','#0F0F0F'],
-    netflix:['#E50914','#0B0B0B'],
-    disney:['#113CCF','#3BA0FF'],
-    steam:['#151A21','#2A475E']
+    amazon:['#232F3E','#FF9900'], psn:['#003791','#0a5bd7'],
+    google:['#4285F4','#34A853'], xbox:['#107C10','#0B6B0B'],
+    spotify:['#1DB954','#0F0F0F'], netflix:['#E50914','#0B0B0B'],
+    disney:['#113CCF','#3BA0FF'],  steam:['#151A21','#2A475E']
   };
 
   const LS = {
@@ -82,37 +78,30 @@
   const getSess   = () => LS.get(LS_SESS, null);
   const setSess   = v  => LS.set(LS_SESS, v);
   const clearSess = () => LS.del(LS_SESS);
-
   const getCart   = () => LS.get(LS_CART, []);
   const setCart   = v  => LS.set(LS_CART, v);
 
   const $  = s => document.querySelector(s);
   const $$ = s => document.querySelectorAll(s);
-
   const escapeHtml = (str='') =>
     str.replace(/[&<>"'`=\/]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#x2F;','`':'&#x60;','=':'&#x3D;'}[s]));
 
   let lastFocus = null;
   function openModal(id){
-    const m = document.getElementById(id);
-    if(!m) return;
+    const m = document.getElementById(id); if(!m) return;
     lastFocus = document.activeElement;
     m.style.display = 'flex';
     document.documentElement.style.overflow = 'hidden';
-    const focusable = m.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-    focusable?.focus();
+    (m.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')||m).focus();
   }
   function closeModal(id){
-    const m = document.getElementById(id);
-    if(!m) return;
+    const m = document.getElementById(id); if(!m) return;
     m.style.display = 'none';
     document.documentElement.style.overflow = '';
     lastFocus?.focus?.();
   }
-  document.addEventListener('keydown', (e)=>{
-    if(e.key === 'Escape'){
-      ['carrito-modal','contacto-modal','auth-modal','admin-modal'].forEach(closeModal);
-    }
+  document.addEventListener('keydown', e=>{
+    if(e.key==='Escape'){ ['carrito-modal','contacto-modal','auth-modal','admin-modal'].forEach(closeModal); }
   });
 
   function agruparCarrito(items){
@@ -178,10 +167,12 @@
     const sel = document.getElementById(selectId);
     const monto = Number(sel?.value || 0);
     if(!monto || isNaN(monto)){ alert('Selecciona un monto válido'); return; }
-    const cart = getCart();
-    cart.push({ id, nombre, precio:monto });
-    setCart(cart);
-    renderCart();
+    const cart = getCart(); cart.push({ id, nombre, precio:monto });
+    setCart(cart); renderCart();
+
+    const cc = document.getElementById('cart-count');
+    cc.classList.remove('bump'); void cc.offsetWidth; cc.classList.add('bump');
+    try { event?.target?.classList?.add('added'); setTimeout(()=>event?.target?.classList?.remove('added'), 650); } catch {}
   }
 
   function buildOrderSummary(){
@@ -201,19 +192,14 @@
     const order = {
       id: safeId(),
       userEmail: sess?.email || 'invitado',
-      items,
-      subtotal: sub,
-      iva,
-      total,
+      items, subtotal: sub, iva, total,
       estado:'PENDIENTE',
       metodo: meta.metodo,
       banco: meta.banco || null,
       nota: meta.nota || '',
       creadoEn: nowISO()
     };
-    const orders = getOrders();
-    orders.unshift(order);
-    setOrders(orders);
+    const orders = getOrders(); orders.unshift(order); setOrders(orders);
     return order;
   }
 
@@ -247,10 +233,7 @@
     const panel = document.getElementById('transfer-form');
     const radioTransfer = document.querySelector('input[name="paymethod"][value="transfer"]');
     const show = method === 'transfer';
-    if(panel){
-      panel.hidden = !show;
-      panel.style.display = show ? 'block' : 'none';
-    }
+    if(panel){ panel.hidden = !show; panel.style.display = show ? 'block' : 'none'; }
     if(radioTransfer) radioTransfer.setAttribute('aria-expanded', show ? 'true' : 'false');
   }
   document.addEventListener('change',e=>{
@@ -258,22 +241,14 @@
   });
   document.addEventListener('change',e=>{
     if(e.target.id==='transfer-bank'){
-      const bank = e.target.value;
-      const list = document.getElementById('bank-data');
-      if(!list) return;
-      if(bank==='Cuscatlán'){
-        list.innerHTML = `
-          <li><strong>Beneficiario:</strong> Margarita Castro</li>
-          <li><strong>Banco:</strong> Banco Cuscatlán</li>
-          <li><strong>Cuenta:</strong> 401495002273779 (Ahorros)</li>
-        `;
-      }else{
-        list.innerHTML = `
-          <li><strong>Beneficiario:</strong> Elsa Castro</li>
-          <li><strong>Banco:</strong> Banco Agrícola</li>
-          <li><strong>Cuenta:</strong> 3710993183 (Ahorros)</li>
-        `;
-      }
+      const bank = e.target.value, list = document.getElementById('bank-data'); if(!list) return;
+      list.innerHTML = bank==='Cuscatlán'
+        ? `<li><strong>Beneficiario:</strong> Margarita Castro</li>
+           <li><strong>Banco:</strong> Banco Cuscatlán</li>
+           <li><strong>Cuenta:</strong> 401495002273779 (Ahorros)</li>`
+        : `<li><strong>Beneficiario:</strong> Elsa Castro</li>
+           <li><strong>Banco:</strong> Banco Agrícola</li>
+           <li><strong>Cuenta:</strong> 3710993183 (Ahorros)</li>`;
     }
   });
 
@@ -290,106 +265,74 @@
       const buf = await crypto.subtle.digest('SHA-256', enc);
       return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
     }catch{
-      // fallback simple (no criptográficamente seguro, pero evita romper flujo)
-      let h=0; for(let i=0;i<t.length;i++){ h=(h<<5)-h+t.charCodeAt(i); h|=0; }
-      return String(h);
+      let h=0; for(let i=0;i<t.length;i++){ h=(h<<5)-h+t.charCodeAt(i); h|=0; } return String(h);
     }
   }
-
   function abrirAuth(){ openModal('auth-modal'); }
   function cerrarAuth(){ closeModal('auth-modal'); }
-
   function mostrarLogin(){
-    document.getElementById('tab-login').classList.add('active');
-    document.getElementById('tab-register').classList.remove('active');
-    document.getElementById('login-form').style.display='grid';
-    document.getElementById('register-form').style.display='none';
-    document.getElementById('tab-login').setAttribute('aria-selected','true');
-    document.getElementById('tab-register').setAttribute('aria-selected','false');
+    $('#tab-login').classList.add('active'); $('#tab-register').classList.remove('active');
+    $('#login-form').style.display='grid'; $('#register-form').style.display='none';
+    $('#tab-login').setAttribute('aria-selected','true'); $('#tab-register').setAttribute('aria-selected','false');
   }
   function mostrarRegistro(){
-    document.getElementById('tab-register').classList.add('active');
-    document.getElementById('tab-login').classList.remove('active');
-    document.getElementById('register-form').style.display='grid';
-    document.getElementById('login-form').style.display='none';
-    document.getElementById('tab-register').setAttribute('aria-selected','true');
-    document.getElementById('tab-login').setAttribute('aria-selected','false');
+    $('#tab-register').classList.add('active'); $('#tab-login').classList.remove('active');
+    $('#register-form').style.display='grid'; $('#login-form').style.display='none';
+    $('#tab-register').setAttribute('aria-selected','true'); $('#tab-login').setAttribute('aria-selected','false');
   }
-
   async function registrar(){
-    const name = (document.getElementById('reg-name')?.value || '').trim();
-    const email = normEmail(document.getElementById('reg-email')?.value);
-    const pass = document.getElementById('reg-pass')?.value || '';
+    const name = ($('#reg-name')?.value || '').trim();
+    const email = normEmail($('#reg-email')?.value);
+    const pass = $('#reg-pass')?.value || '';
     if(!name || !email || !pass){ alert('Completa todos los campos'); return; }
-
     const users = getUsers();
     if(users.some(u=>u.email===email)){ alert('Ese email ya está registrado'); return; }
-
     const passh = await hash(pass);
     users.push({ name, email, passh, createdAt: nowISO() });
     setUsers(users);
     setSess({ email, name, isAdmin: email===ADMIN_EMAIL });
-    actualizarUIAuth();
-    cerrarAuth();
-    alert('Cuenta creada.');
+    actualizarUIAuth(); cerrarAuth(); alert('Cuenta creada.');
   }
-
   async function login(){
-    const email = normEmail(document.getElementById('login-email')?.value);
-    const pass = document.getElementById('login-pass')?.value || '';
+    const email = normEmail($('#login-email')?.value);
+    const pass = $('#login-pass')?.value || '';
     if(!email || !pass){ alert('Completa email y contraseña'); return; }
-
-    const users = getUsers();
-    const u = users.find(u=>u.email===email);
+    const users = getUsers(); const u = users.find(u=>u.email===email);
     if(!u){ alert('No existe ese usuario'); return; }
     const passh = await hash(pass);
     if(passh!==u.passh){ alert('Contraseña incorrecta'); return; }
-
     setSess({ email: u.email, name: u.name, isAdmin: email===ADMIN_EMAIL });
-    actualizarUIAuth();
-    cerrarAuth();
-    alert('Sesión iniciada.');
+    actualizarUIAuth(); cerrarAuth(); alert('Sesión iniciada.');
   }
-
   function logout(){ clearSess(); actualizarUIAuth(); alert('Sesión cerrada.'); }
-
   function adminAccesoRapido(){
     const pin = prompt('PIN admin:');
-    if(pin===ADMIN_PIN){
-      setSess({ email: ADMIN_EMAIL, name:'Administrador', isAdmin:true });
-      actualizarUIAuth(); cerrarAuth(); abrirAdmin();
-    }else alert('PIN incorrecto');
+    if(pin===ADMIN_PIN){ setSess({ email: ADMIN_EMAIL, name:'Administrador', isAdmin:true }); actualizarUIAuth(); cerrarAuth(); abrirAdmin(); }
+    else alert('PIN incorrecto');
   }
-
   function actualizarUIAuth(){
     const sess = getSess();
-    const btn = document.getElementById('auth-btn');
-    const adminBtn = document.getElementById('admin-open');
-
+    const btn = $('#auth-btn'); const adminBtn = $('#admin-open');
     if(sess){
       btn.textContent = `👤 ${sess.name || sess.email}`;
       btn.onclick = () => { if(confirm('¿Cerrar sesión?')) logout(); };
       adminBtn.style.display = sess.isAdmin ? 'inline-block' : 'none';
-      const span = document.getElementById('admin-session-email'); if(span) span.textContent = sess.email;
+      const span = $('#admin-session-email'); if(span) span.textContent = sess.email;
     }else{
-      btn.textContent = '👤 Acceder';
-      btn.onclick = abrirAuth;
-      adminBtn.style.display = 'none';
-      const span = document.getElementById('admin-session-email'); if(span) span.textContent = '-';
+      btn.textContent = '👤 Acceder'; btn.onclick = abrirAuth; adminBtn.style.display = 'none';
+      const span = $('#admin-session-email'); if(span) span.textContent = '-';
     }
   }
 
   function abrirAdmin(){
-    const s = getSess();
-    if(!(s?.isAdmin)){ abrirAuth(); return; }
-    openModal('admin-modal');
-    renderPedidos(); renderUsuarios();
+    const s = getSess(); if(!(s?.isAdmin)){ abrirAuth(); return; }
+    openModal('admin-modal'); renderPedidos(); renderUsuarios();
   }
   function cerrarAdmin(){ closeModal('admin-modal'); }
 
   function renderPedidos(){
-    const list = document.getElementById('orders-list');
-    const filter = document.getElementById('orders-filter')?.value || 'ALL';
+    const list = $('#orders-list');
+    const filter = $('#orders-filter')?.value || 'ALL';
     const orders = getOrders();
     const rows = (filter==='ALL'?orders:orders.filter(o=>o.estado===filter));
     list.innerHTML = rows.length ? '' : '<p class="small">No hay pedidos.</p>';
@@ -414,28 +357,22 @@
       list.appendChild(d);
     });
   }
-
   function cambiarEstado(id,estado){
     const orders = getOrders();
     const i = orders.findIndex(o=>o.id===id);
     if(i>-1){ orders[i].estado=estado; setOrders(orders); renderPedidos(); }
   }
-
   function enviarWhatsDePedido(id){
-    const o = getOrders().find(x=>x.id===id);
-    if(!o) return;
+    const o = getOrders().find(x=>x.id===id); if(!o) return;
     const lines = o.items.map(it=>`• ${it.nombre} — ${it.cantidad} × ${money(it.precio)} = ${money(it.precio*it.cantidad)}`);
     const msg = `*Pedido Tati Shop – ${id}*\nCliente: ${o.userEmail}\n\n*Artículos:*\n${lines.join('\n')}\n\n*Subtotal:* ${money(o.subtotal)}\n*IVA:* ${money(o.iva)}\n*Total:* ${money(o.total)}\n*Estado:* ${o.estado}\n*Método:* ${o.metodo}${o.banco?` (${o.banco})`:''}`;
     window.open(`https://wa.me/${WSP_NUM}?text=${encodeURIComponent(msg)}`,'_blank');
   }
-
   function renderUsuarios(){
-    const list = document.getElementById('users-list');
-    const users = getUsers();
+    const list = $('#users-list'); const users = getUsers();
     list.innerHTML = users.length ? '' : '<p class="small">Sin usuarios registrados.</p>';
     users.forEach(u=>{
-      const d = document.createElement('div');
-      d.className='order';
+      const d = document.createElement('div'); d.className='order';
       const fecha = new Date(u.createdAt).toLocaleString();
       d.innerHTML = `
         <div class="row"><strong>${escapeHtml(u.name || '(sin nombre)')}</strong><span class="small">${escapeHtml(u.email)}</span></div>
@@ -449,7 +386,7 @@
   let slideIndex=0, slideTimer=null;
 
   function setSlideBackground(id){
-    const [c1,c2] = brandBg[id] || ['#ff9ec1','#ff5d96'];
+    const [c1,c2] = brandBg[id] || ['#7c5cff','#2ee6a6'];
     const bg = document.getElementById('slide-bg');
     bg.classList.remove('show');
     bg.style.setProperty('--c1',c1);
@@ -457,7 +394,6 @@
     void bg.offsetWidth;
     bg.classList.add('show');
   }
-
   function pintarSlide(index){
     const id = slideshowIds[index];
     const it = giftcards.find(g=>g.id===id);
@@ -475,15 +411,12 @@
     card.classList.add('active');
     document.querySelectorAll('#slide-dots button').forEach((b,i)=>b.classList.toggle('active',i===index));
   }
-
   function slideNext(){ slideIndex=(slideIndex+1)%slideshowIds.length; pintarSlide(slideIndex); }
   function slidePrev(){ slideIndex=(slideIndex-1+slideshowIds.length)%slideshowIds.length; pintarSlide(slideIndex); }
   function iniciarAutoSlide(){ detenerAutoSlide(); slideTimer=setInterval(slideNext,3000); }
   function detenerAutoSlide(){ if(slideTimer) clearInterval(slideTimer); slideTimer=null; }
-
   function initSlideshow(){
-    const dots = document.getElementById('slide-dots');
-    dots.innerHTML = '';
+    const dots = document.getElementById('slide-dots'); dots.innerHTML='';
     slideshowIds.forEach((_,i)=>{
       const b = document.createElement('button');
       b.setAttribute('aria-label', `Ir a la diapositiva ${i+1}`);
@@ -495,20 +428,14 @@
     const ss = document.getElementById('slideshow');
     ss.addEventListener('mouseenter',detenerAutoSlide);
     ss.addEventListener('mouseleave',iniciarAutoSlide);
-    pintarSlide(slideIndex);
-    iniciarAutoSlide();
+    pintarSlide(slideIndex); iniciarAutoSlide();
   }
 
-  function vaciarCarrito(){ setCart([]); renderCart(); }
-  function abrirCarrito(){ renderCart(); openModal('carrito-modal'); }
-  function cerrarCarrito(){ closeModal('carrito-modal'); }
-
-  window.renderGiftCards = renderGiftCards;
   window.agregarAlCarrito = agregarAlCarrito;
-  window.vaciarCarrito = vaciarCarrito;
-  window.abrirCarrito = abrirCarrito;
-  window.cerrarCarrito = cerrarCarrito;
-  window.procesarPago = procesarPago;
+  window.vaciarCarrito = () => { setCart([]); renderCart(); };
+  window.abrirCarrito  = () => { renderCart(); openModal('carrito-modal'); };
+  window.cerrarCarrito = () => closeModal('carrito-modal');
+  window.procesarPago  = procesarPago;
 
   window.abrirContacto = abrirContacto;
   window.cerrarContacto = cerrarContacto;
@@ -538,11 +465,7 @@
     renderCart();
 
     const bankSelect = document.getElementById('transfer-bank');
-    if(bankSelect){
-      bankSelect.value='Cuscatlán';
-      bankSelect.dispatchEvent(new Event('change'));
-    }
+    if(bankSelect){ bankSelect.value='Cuscatlán'; bankSelect.dispatchEvent(new Event('change')); }
     updateTransferVisibility();
   });
-
 })();
