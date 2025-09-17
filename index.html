@@ -3,99 +3,131 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <title>Gift Cards | Tati Shop</title>
-  <meta name="description" content="Compra gift cards digitales de forma rápida, segura y al instante. Tati Shop te ofrece las mejores marcas para regalar.">
-  <meta name="keywords" content="gift cards, tati shop, tarjetas regalo, digitales, comprar online">
-  <meta name="author" content="Tati Shop" />
+  <meta name="description" content="Compra y regala gift cards digitales en Tati Shop: Google Play, Xbox, PlayStation y más. Entrega rápida por WhatsApp o correo." />
+
+  <link rel="canonical" href="https://tati-shop.com/" />
+  <meta property="og:title" content="Gift Cards | Tati Shop" />
+  <meta property="og:description" content="Elige, regala, sorprende — digital y al instante." />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="es_SV" />
+  <meta property="og:image" content="img/og-image.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preload" href="css/style.css" as="style">
   <link rel="stylesheet" href="css/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
+
+  <link rel="icon" href="img/favicon.ico">
+  <meta name="theme-color" content="#0f1220">
+
 </head>
 <body>
+  <a class="skiplink" href="#contenido">Saltar al contenido</a>
 
-  <!-- Header -->
-  <header class="main-header">
+  <header class="main-header" role="banner">
     <div class="top-bar">
-      <img src="img/logo.svg" alt="Tati Shop Logo" class="logo-left" />
-      <div class="top-actions">
-        <button class="secundario-btn" onclick="abrirContacto()">📞 Contacto</button>
-        <button class="secundario-btn" id="auth-btn" onclick="abrirAuth()">👤 Acceder</button>
-        <button class="secundario-btn" id="admin-open" onclick="abrirAdmin()" style="display:none;">🛠️ Admin</button>
-        <button class="carrito-btn" onclick="abrirCarrito()">🛒 Ver Carrito (<span id="cart-count">0</span>)</button>
+      <a href="#" class="brand" aria-label="Inicio">
+        <img src="img/logo.svg" alt="Tati Shop" class="logo-left" width="128" height="32" />
+      </a>
+
+      <div class="top-actions" role="navigation" aria-label="Acciones rápidas">
+        <button class="secundario-btn" onclick="abrirContacto()" aria-haspopup="dialog">📞 Contacto</button>
+        <button class="secundario-btn" id="auth-btn" onclick="abrirAuth()" aria-haspopup="dialog">👤 Acceder</button>
+        <button class="secundario-btn" id="admin-open" onclick="abrirAdmin()" style="display:none;" aria-haspopup="dialog">🛠️ Admin</button>
+        <button class="carrito-btn" onclick="abrirCarrito()" aria-haspopup="dialog" aria-controls="carrito-modal">
+          🛒 Ver Carrito (<span id="cart-count" aria-live="polite">0</span>)
+        </button>
       </div>
     </div>
-    <div class="header-content">
+
+    <div class="header-content" id="home">
       <h1>🎁 Gift Cards Tati Shop</h1>
-      <p>Elige, regala, sorprende — digital y al instante</p>
+      <p class="tagline">Elige, regala, sorprende — digital y al instante</p>
+      <div class="cta-row" role="group" aria-label="Acciones principales">
+        <a href="#catalogo" class="btn primary">Ver catálogo</a>
+        <button class="btn outline" onclick="abrirAuth()">Crear cuenta</button>
+      </div>
     </div>
   </header>
 
-  <!-- Slideshow -->
-  <section class="slideshow-section">
-    <div class="slideshow" id="slideshow">
-      <button class="slide-btn prev" id="slide-prev" aria-label="Anterior">&#10094;</button>
-      <div class="slide-viewport">
-        <div class="slide-bg" id="slide-bg"></div>
-        <div class="slide-card" id="slide-card"></div>
+  <section class="slideshow-section" aria-labelledby="destacados-title">
+    <h2 id="destacados-title" class="sr-only">Gift cards destacadas</h2>
+
+    <div class="slideshow" id="slideshow" role="region" aria-roledescription="carrusel" aria-label="Promociones" aria-live="polite">
+      <button class="slide-btn prev" id="slide-prev" aria-label="Anterior" aria-controls="slide-viewport">&#10094;</button>
+
+      <div class="slide-viewport" id="slide-viewport">
+        <div class="slide-bg" id="slide-bg" aria-hidden="true"></div>
+        <div class="slide-card" id="slide-card" role="group" aria-label="Diapositiva"></div>
       </div>
-      <button class="slide-btn next" id="slide-next" aria-label="Siguiente">&#10095;</button>
+
+      <button class="slide-btn next" id="slide-next" aria-label="Siguiente" aria-controls="slide-viewport">&#10095;</button>
     </div>
-    <div class="slide-dots" id="slide-dots"></div>
+
+    <div class="slide-dots" id="slide-dots" role="tablist" aria-label="Seleccionar diapositiva"></div>
   </section>
 
-  <!-- Productos -->
-  <main>
-    <div class="grid" id="giftcards-grid"></div>
+  <main id="contenido" tabindex="-1">
+    <section aria-labelledby="catalogo-title">
+      <h2 id="catalogo-title">Catálogo</h2>
+      <div class="grid" id="giftcards-grid" role="list"></div>
+    </section>
   </main>
 
-  <!-- Footer -->
-  <footer>
+  <footer role="contentinfo">
     © 2025 Tati Shop · Soporte:
     <a href="mailto:ventas-online@tati-shop.com">ventas-online@tati-shop.com</a>
   </footer>
 
-  <!-- MODALES -->
-
-  <!-- 🛒 Carrito -->
-  <div class="modal" id="carrito-modal">
+  <div class="modal" id="carrito-modal" role="dialog" aria-modal="true" aria-labelledby="carrito-title">
     <div class="modal-content">
-      <span class="close" onclick="cerrarCarrito()">&times;</span>
-      <h2>🛍️ Tu Carrito</h2>
+      <button class="close" onclick="cerrarCarrito()" aria-label="Cerrar">×</button>
+      <h2 id="carrito-title">🛍️ Tu Carrito</h2>
 
-      <div class="cart-items" id="cart-items"></div>
+      <div class="cart-items" id="cart-items" role="list"></div>
 
-      <div class="checkout-box">
-        <h3>💳 Método de pago</h3>
-        <label class="pay-option">
-          <input type="radio" name="paymethod" value="whatsapp" checked>
-          <span>💬 Pagar por WhatsApp</span>
-        </label>
-        <label class="pay-option">
-          <input type="radio" name="paymethod" value="transfer">
-          <span>🏦 Transferencia (Cuscatlán / Agrícola)</span>
-        </label>
+      <div class="checkout-box" aria-labelledby="pago-title">
+        <h3 id="pago-title">💳 Método de pago</h3>
 
-        <div id="transfer-form" class="transfer-form" style="display:none;">
+        <fieldset class="pay-options">
+          <legend class="sr-only">Selecciona método</legend>
+
+          <label class="pay-option">
+            <input type="radio" name="paymethod" value="whatsapp" checked>
+            <span>💬 Pagar por WhatsApp</span>
+          </label>
+
+          <label class="pay-option">
+            <input type="radio" name="paymethod" value="transfer" aria-controls="transfer-form" aria-expanded="false">
+            <span>🏦 Transferencia (Cuscatlán / Agrícola)</span>
+          </label>
+        </fieldset>
+
+        <div id="transfer-form" class="transfer-form" hidden>
           <label for="transfer-bank">Banco al que harás la transferencia:</label>
           <select id="transfer-bank">
             <option value="Cuscatlán">Banco Cuscatlán</option>
             <option value="Agrícola">Banco Agrícola</option>
           </select>
+
           <div class="bank-instructions">
             <p><strong>Datos para Transferencia:</strong></p>
-            <ul id="bank-data">
-              <!-- contenido dinámico -->
-            </ul>
-            <p>Al finalizar, envía el comprobante por WhatsApp para verificar tu pedido.</p>
+            <ul id="bank-data"></ul>
+            <p>Al finalizar, envía el comprobante por WhatsApp para verificar y aprobar tu pedido.</p>
           </div>
         </div>
       </div>
 
       <div class="checkout-box">
         <label for="buyer-note">Nota / Datos de entrega (opcional):</label>
-        <textarea id="buyer-note" placeholder="Correo para envío, nombre del destinatario, mensaje en la tarjeta, etc."></textarea>
+        <textarea id="buyer-note" placeholder="Correo para envío, nombre del destinatario, mensaje en la tarjeta, etc." rows="3"></textarea>
       </div>
 
-      <div class="totals" id="totales"></div>
+      <div class="totals" id="totales" aria-live="polite"></div>
 
       <div class="checkout-actions">
         <button class="secundario-btn" onclick="vaciarCarrito()">🗑️ Vaciar carrito</button>
@@ -104,58 +136,63 @@
     </div>
   </div>
 
-  <!-- 📞 Contacto -->
-  <div class="modal" id="contacto-modal">
+  <div class="modal" id="contacto-modal" role="dialog" aria-modal="true" aria-labelledby="contacto-title">
     <div class="modal-content">
-      <span class="close" onclick="cerrarContacto()">&times;</span>
-      <h2>📞 Contáctanos</h2>
+      <button class="close" onclick="cerrarContacto()" aria-label="Cerrar">×</button>
+      <h2 id="contacto-title">📞 Contáctanos</h2>
+
       <ul class="contact-list">
         <li>📧 <a href="mailto:ventas-online@tati-shop.com">ventas-online@tati-shop.com</a></li>
         <li>💬 <a href="https://wa.me/50379553318" target="_blank" rel="noopener">WhatsApp: +503 7955 3318</a></li>
       </ul>
+
       <div class="quick-message">
         <label for="contact-msg">Mensaje rápido (opcional):</label>
-        <textarea id="contact-msg" placeholder="Escribe tu consulta y te llevamos a WhatsApp con este texto..."></textarea>
+        <textarea id="contact-msg" placeholder="Escribe tu consulta y te llevamos a WhatsApp con este texto..." rows="3"></textarea>
         <button class="pagar-wsp-btn" onclick="enviarWhatsAppContacto()">Enviar a WhatsApp</button>
       </div>
     </div>
   </div>
 
-  <!-- 👤 Auth -->
-  <div class="modal" id="auth-modal">
+  <div class="modal" id="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-title">
     <div class="modal-content auth">
-      <span class="close" onclick="cerrarAuth()">&times;</span>
-      <div class="auth-tabs">
-        <button id="tab-login" class="active" onclick="mostrarLogin()">Iniciar Sesión</button>
-        <button id="tab-register" onclick="mostrarRegistro()">Registrarse</button>
+      <button class="close" onclick="cerrarAuth()" aria-label="Cerrar">×</button>
+
+      <h2 id="auth-title" class="sr-only">Acceder a Tati Shop</h2>
+
+      <div class="auth-tabs" role="tablist" aria-label="Autenticación">
+        <button id="tab-login" class="active" onclick="mostrarLogin()" role="tab" aria-selected="true" aria-controls="login-form">Iniciar Sesión</button>
+        <button id="tab-register" onclick="mostrarRegistro()" role="tab" aria-selected="false" aria-controls="register-form">Registrarse</button>
       </div>
-      <div id="login-form" class="auth-pane">
-        <label>Email</label>
-        <input type="email" id="login-email" placeholder="tu@email.com">
-        <label>Contraseña</label>
-        <input type="password" id="login-pass" placeholder="********">
+
+      <div id="login-form" class="auth-pane" role="tabpanel" aria-labelledby="tab-login">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" placeholder="tu@email.com" autocomplete="username">
+        <label for="login-pass">Contraseña</label>
+        <input type="password" id="login-pass" placeholder="********" autocomplete="current-password">
         <button class="pagar-wsp-btn" onclick="login()">Entrar</button>
+
         <div class="admin-quick">
           <button class="secundario-btn" onclick="adminAccesoRapido()">🔐 Acceso rápido Admin</button>
         </div>
       </div>
-      <div id="register-form" class="auth-pane" style="display:none;">
-        <label>Nombre</label>
-        <input type="text" id="reg-name" placeholder="Tu nombre">
-        <label>Email</label>
-        <input type="email" id="reg-email" placeholder="tu@email.com">
-        <label>Contraseña</label>
-        <input type="password" id="reg-pass" placeholder="********">
+
+      <div id="register-form" class="auth-pane" style="display:none;" role="tabpanel" aria-labelledby="tab-register">
+        <label for="reg-name">Nombre</label>
+        <input type="text" id="reg-name" placeholder="Tu nombre" autocomplete="name">
+        <label for="reg-email">Email</label>
+        <input type="email" id="reg-email" placeholder="tu@email.com" autocomplete="email">
+        <label for="reg-pass">Contraseña</label>
+        <input type="password" id="reg-pass" placeholder="********" autocomplete="new-password">
         <button class="pagar-wsp-btn" onclick="registrar()">Crear cuenta</button>
       </div>
     </div>
   </div>
 
-  <!-- 🛠️ Admin -->
-  <div class="modal" id="admin-modal">
+  <div class="modal" id="admin-modal" role="dialog" aria-modal="true" aria-labelledby="admin-title">
     <div class="modal-content admin">
-      <span class="close" onclick="cerrarAdmin()">&times;</span>
-      <h2>🛠️ Panel Admin</h2>
+      <button class="close" onclick="cerrarAdmin()" aria-label="Cerrar">×</button>
+      <h2 id="admin-title">🛠️ Panel Admin</h2>
 
       <div class="admin-header">
         <div><strong>Sesión:</strong> <span id="admin-session-email">-</span></div>
@@ -165,10 +202,10 @@
       </div>
 
       <div class="admin-panels">
-        <div class="admin-panel">
-          <h3>📦 Pedidos</h3>
+        <section class="admin-panel" aria-labelledby="pedidos-title">
+          <h3 id="pedidos-title">📦 Pedidos</h3>
           <div class="filters">
-            <label>Filtrar:</label>
+            <label for="orders-filter">Filtrar:</label>
             <select id="orders-filter" onchange="renderPedidos()">
               <option value="ALL">Todos</option>
               <option value="PENDIENTE">Pendiente</option>
@@ -177,18 +214,23 @@
               <option value="CANCELADO">Cancelado</option>
             </select>
           </div>
-          <div id="orders-list" class="list"></div>
-        </div>
+          <div id="orders-list" class="list" role="list"></div>
+        </section>
 
-        <div class="admin-panel">
-          <h3>👥 Usuarios</h3>
-          <div id="users-list" class="list"></div>
-        </div>
+        <section class="admin-panel" aria-labelledby="usuarios-title">
+          <h3 id="usuarios-title">👥 Usuarios</h3>
+          <div id="users-list" class="list" role="list"></div>
+        </section>
       </div>
     </div>
   </div>
 
-  <!-- Script principal -->
-  <script src="js/main.js"></script>
+  <noscript>
+    <div class="noscript">
+      Para usar Tati Shop necesitas habilitar JavaScript.
+    </div>
+  </noscript>
+
+  <script src="js/main.js" defer></script>
 </body>
 </html>
