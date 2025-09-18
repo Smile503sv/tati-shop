@@ -1,3 +1,4 @@
+/* --- RESET & BASE --- */
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 body { margin: 0; font-family: "Montserrat", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
@@ -18,6 +19,23 @@ body { margin: 0; font-family: "Montserrat", system-ui, -apple-system, Segoe UI,
   --shadow:0 8px 30px rgba(0,0,0,.25);
 }
 
+@media (prefers-color-scheme: light){
+  :root{
+    --bg:#f7f8fc;
+    --surface:#ffffff;
+    --surface-2:#f3f5fb;
+    --text:#162033;
+    --muted:#55617a;
+    --line:#e7ebf3;
+    --brand:#5b43ff;
+    --brand-2:#21c897;
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  * { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
+
 body {
   background: linear-gradient(120deg, #f7fffc 0%, #c6f0f9 100%);
   color: var(--text);
@@ -36,23 +54,6 @@ body {
 }
 @keyframes bgmove {
   to { background-position: 30% 45%, 70% 55%; }
-}
-
-@media (prefers-color-scheme: light){
-  :root{
-    --bg:#f7f8fc;
-    --surface:#ffffff;
-    --surface-2:#f3f5fb;
-    --text:#162033;
-    --muted:#55617a;
-    --line:#e7ebf3;
-    --brand:#5b43ff;
-    --brand-2:#21c897;
-  }
-}
-
-@media (prefers-reduced-motion: reduce){
-  * { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
 
 a { color: inherit; text-decoration: none; }
@@ -125,6 +126,7 @@ input, select, textarea {
   padding: 10px 12px;
 }
 
+/* --- SLIDESHOW & PROMOS --- */
 .slideshow-section { padding: 14px 0 4px; }
 .slideshow {
   display: grid; grid-template-columns: auto 1fr auto; gap: 8px;
@@ -164,6 +166,7 @@ input, select, textarea {
 .slide-card.active { transform: translateY(0); opacity: 1; box-shadow: 0 14px 30px rgba(0,0,0,.25), 0 0 0 1px rgba(255,255,255,.03) inset; }
 .slide-card img { max-height: 46px; margin: 0 auto 6px; }
 
+/* --- SLIDE DOTS --- */
 .slide-dots { display: flex; justify-content: center; gap: 6px; margin-top: 8px; }
 .slide-dots button {
   width: 8px; height: 8px; border-radius: 999px;
@@ -171,6 +174,7 @@ input, select, textarea {
 }
 .slide-dots button.active { background: var(--brand); border-color: transparent; }
 
+/* --- CATÁLOGO DE GIFT CARDS --- */
 .grid {
   display: grid; gap: 16px;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -181,21 +185,41 @@ input, select, textarea {
   box-shadow: 0 8px 32px rgba(39,201,230,0.13);
   backdrop-filter: blur(3px);
   border: 1px solid #c6f0f988;
-  padding: 16px;
-  display: grid; gap: 10px;
+  padding: 12px 12px 18px 12px;
+  min-height: 220px;
+  display: grid; gap: 8px;
   transition: transform .22s, box-shadow .22s;
 }
 .giftcard-card:hover, .card:hover {
   transform: scale(1.045) translateY(-4px);
   box-shadow: 0 16px 32px rgba(39,201,230,0.19);
 }
+
+/* --- AJUSTE DE IMÁGENES DE PRODUCTOS --- */
 .giftcard-card img, .card img {
   border-radius: 1.2em 1.2em 0 0;
-  object-fit: cover;
+  object-fit: contain;
   width: 100%;
-  height: 145px;
+  height: 80px; /* Ajuste: tamaño más pequeño y elegante */
   background: #e3faff;
+  padding: 18px 10px 12px 10px;
+  box-sizing: border-box;
+  display: block;
+  margin: 0 auto;
 }
+
+/* Responsive para móviles */
+@media (max-width: 520px){
+  .giftcard-card img, .card img {
+    height: 58px;
+    padding: 10px 2px 8px 2px;
+  }
+  .giftcard-card, .card {
+    min-height: 150px;
+    padding: 8px 6px 12px 6px;
+  }
+}
+
 .giftcard-card .btn-cart, .card .btn-cart {
   background: #27c9e6;
   color: #fff;
@@ -309,7 +333,6 @@ footer {
   border: 1px solid #ffe09a; border-radius: 10px;
 }
 
-
 @keyframes jelly {
   0%{ transform: scale(1); }
   30%{ transform: scale(1.06,.94); }
@@ -318,6 +341,7 @@ footer {
   100%{ transform: scale(1); }
 }
 .buy-btn.added { animation: jelly 600ms ease; }
+
 @keyframes bump {
   0%{ transform: scale(1); }
   30%{ transform: scale(1.25); }
@@ -326,6 +350,9 @@ footer {
 }
 #cart-count.bump { display: inline-block; animation: bump 420ms ease; }
 
+.slide-card.active {
+  box-shadow: 0 14px 30px rgba(0,0,0,.25), 0 0 0 1px rgba(255,255,255,.03) inset;
+}
 
 .theme--tati {
   --brand:#7a2cff;
@@ -347,7 +374,6 @@ footer {
   --brand:#6a1dff;
   --brand-2:#00c9b8;
 }
-
 
 @media (max-width: 880px){
   .admin-panels { grid-template-columns: 1fr; }
