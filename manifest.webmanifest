@@ -1,0 +1,14 @@
+{
+  "name": "Tati Shop - Gift Cards",
+  "short_name": "Tati Shop",
+  "description": "Elige, regala, sorprende — digital y al instante.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b0916",
+  "theme_color": "#7a2cff",
+  "icons": [
+    { "src": "img/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "img/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
