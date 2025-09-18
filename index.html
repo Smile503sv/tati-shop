@@ -3,51 +3,63 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
   <title>Gift Cards | Tati Shop</title>
-  <meta name="description" content="Compra y regala gift cards digitales en Tati Shop: Google Play, Xbox, PlayStation y más. Entrega rápida por WhatsApp o correo." />
 
-  <link rel="canonical" href="https://tati-shop.com/">
-  <meta property="og:title" content="Gift Cards | Tati Shop">
-  <meta property="og:description" content="Elige, regala, sorprende — digital y al instante.">
-  <meta property="og:type" content="website">
-  <meta property="og:locale" content="es_SV">
-  <meta property="og:image" content="img/og-image.jpg">
-  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
 
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preload" href="css/style.css" as="style">
-  <link rel="stylesheet" href="css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#7a2cff" />
 
-  <link rel="icon" href="img/logo.svg" type="image/svg+xml">
-  <meta name="theme-color" content="#0b0916">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/icons/icon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="img/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="img/icons/icon-192.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Store",
+    "name": "Tati Shop",
+    "url": "https://tati-shop.com",
+    "logo": "https://tati-shop.com/img/logo.svg",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "email": "ventas-online@tati-shop.com",
+      "contactType": "customer service",
+      "availableLanguage": ["es"]
+    },
+    "sameAs": ["https://wa.me/50379553318"],
+    "makesOffer": {
+      "@type": "OfferCatalog",
+      "name": "Gift Cards",
+      "itemListElement": [
+        { "@type": "Product", "name": "Google Play Gift Card", "brand": "Google Play" },
+        { "@type": "Product", "name": "PlayStation Gift Card", "brand": "Sony" },
+        { "@type": "Product", "name": "Xbox Gift Card", "brand": "Microsoft" }
+      ]
+    }
+  }
+  </script>
 </head>
-
 <body class="theme--tati">
   <a class="skiplink" href="#contenido">Saltar al contenido</a>
 
   <header class="main-header" role="banner">
-    <div class="top-bar container">
+    <div class="top-bar">
       <a href="#" class="brand" aria-label="Inicio">
-        <span class="logo-badge" aria-hidden="true">
-          <img src="img/logo.svg" alt="" class="logo-left" width="44" height="44">
-        </span>
-        <strong class="brand-title">Tati Shop</strong>
+        <img src="img/logo.svg" alt="Tati Shop" class="logo-left" width="160" height="40" loading="eager" />
       </a>
-
       <div class="top-actions" role="navigation" aria-label="Acciones rápidas">
         <button class="secundario-btn" onclick="abrirContacto()" aria-haspopup="dialog">📞 Contacto</button>
         <button class="secundario-btn" id="auth-btn" onclick="abrirAuth()" aria-haspopup="dialog">👤 Acceder</button>
         <button class="secundario-btn" id="admin-open" onclick="abrirAdmin()" style="display:none;" aria-haspopup="dialog">🛠️ Admin</button>
         <button class="carrito-btn" onclick="abrirCarrito()" aria-haspopup="dialog" aria-controls="carrito-modal">
-          🛒 Ver Carrito ( <span id="cart-count" aria-live="polite">0</span> )
+          🛒 Ver Carrito (<span id="cart-count" aria-live="polite">0</span>)
         </button>
       </div>
     </div>
 
-    <div class="header-content container" id="home">
+    <div class="header-content" id="home">
       <h1>🎁 Gift Cards Tati Shop</h1>
       <p class="tagline">Elige, regala, sorprende — digital y al instante</p>
       <div class="cta-row" role="group" aria-label="Acciones principales">
@@ -57,7 +69,7 @@
     </div>
   </header>
 
-  <section class="slideshow-section container" aria-labelledby="destacados-title">
+  <section class="slideshow-section" aria-labelledby="destacados-title">
     <h2 id="destacados-title" class="sr-only">Gift cards destacadas</h2>
 
     <div class="slideshow" id="slideshow" role="region" aria-roledescription="carrusel" aria-label="Promociones" aria-live="polite">
@@ -74,7 +86,7 @@
     <div class="slide-dots" id="slide-dots" role="tablist" aria-label="Seleccionar diapositiva"></div>
   </section>
 
-  <main id="contenido" class="container" tabindex="-1">
+  <main id="contenido" tabindex="-1">
     <section aria-labelledby="catalogo-title">
       <h2 id="catalogo-title">Catálogo</h2>
       <div class="grid" id="giftcards-grid" role="list"></div>
@@ -229,11 +241,17 @@
   </div>
 
   <noscript>
-    <div class="noscript container">
-      Para usar Tati Shop necesitas habilitar JavaScript.
-    </div>
+    <div class="noscript">Para usar Tati Shop necesitas habilitar JavaScript.</div>
   </noscript>
 
   <script src="js/main.js" defer></script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(console.error);
+      });
+    }
+  </script>
 </body>
 </html>
