@@ -1,29 +1,30 @@
 (()=>{
+
+  // ======= CONFIG =======
   const IVA = 0.07;
   const WSP_NUM = '50379553318';
   const SOPORTE_MAIL = 'ventas-online@tati-shop.com';
-  const ADMIN_EMAILS = ['ventas-online@tati-shop.com'];
+  const ADMIN_EMAILS = ['ventas-online@tati-shop.com']; // agrega más si deseas
   const ADMIN_PIN = '8642';
 
+  // ======= STORAGE KEYS =======
   const LS_USERS  = 'tati_users';
   const LS_ORDERS = 'tati_orders';
   const LS_SESS   = 'tati_session';
   const LS_CART   = 'tati_cart';
-  const LS_CODES  = 'tati_codes';
+  const LS_CODES  = 'tati_codes'; // pool de códigos digitales
 
+  // ======= HELPERS =======
   const money = n => `$${Number(n||0).toFixed(2)}`;
   const nowISO = () => new Date().toISOString();
   const safeId = () => `PED-${Date.now()}-${Math.random().toString(36).slice(2,7).toUpperCase()}`;
   const normEmail = e => (e||'').trim().toLowerCase();
-
   const byId = id => document.getElementById(id);
   const $ = s => document.querySelector(s);
   const $$ = s => document.querySelectorAll(s);
-
-  const escapeHtml = (str='') =>
-    str.replace(/[&<>"'`=\/]/g, s => ({
-      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#x2F;','`':'&#x60;','=':'&#x3D;'
-    }[s]));
+  const escapeHtml = (str='') => str.replace(/[&<>"'`=\/]/g, s => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#x2F;','`':'&#x60;','=':'&#x3D;'
+  }[s]));
 
   const LS = {
     get:(k,fb)=>{ try{ return JSON.parse(localStorage.getItem(k)) ?? fb; } catch { return fb; } },
@@ -36,6 +37,7 @@
   const getCart=()=>LS.get(LS_CART,[]), setCart=v=>LS.set(LS_CART,v);
   const getCodes=()=>LS.get(LS_CODES,[]), setCodes=v=>LS.set(LS_CODES,v);
 
+  // ======= DATA =======
   const giftcards = [
     {id:'amazon', nombre:'Amazon', brand:'Amazon', montos:[10,25,50,100], logo:'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg'},
     {id:'google', nombre:'Google Play', brand:'Google Play', montos:[10,15,25,50,100], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Google-Play.webp'},
@@ -111,9 +113,10 @@
     steam:['#151A21','#2A475E']
   };
 
+  // ======= MODALES =======
   let lastFocus = null;
   function modal(el, open){
-    const m = typeof el==='string' ? byId(el) : el;
+    const m = typeof el==='string'?byId(el):el;
     if(!m) return;
     if(open){
       lastFocus = document.activeElement;
@@ -126,15 +129,22 @@
       lastFocus?.focus?.();
     }
   }
-  function openModal(id){ modal(id, true); }
-  function closeModal(id){ modal(id, false); }
+  function openModal(id){ modal(id,true); }
+  function closeModal(id){ modal(id,false); }
 
+  // Esc cierra
   addEventListener('keydown', e=>{
     if(e.key==='Escape'){
       ['carrito-modal','contacto-modal','auth-modal','admin-modal','orders-modal','product-modal'].forEach(id=>modal(id,false));
     }
   });
+  // Clic en fondo cierra
+  addEventListener('click', e=>{
+    const m = e.target.classList?.contains('modal') ? e.target : null;
+    if(m) modal(m,false);
+  });
 
+  // ======= CARRITO =======
   function agruparCarrito(items){
     const m = new Map();
     items.forEach(it=>{
@@ -147,8 +157,7 @@
 
   function renderCart(){
     const cart = getCart();
-    const cc = byId('cart-count');
-    if(cc) cc.textContent = cart.length;
+    const cc = byId('cart-count'); if(cc) cc.textContent = cart.length;
 
     const wrap = byId('cart-items');
     const totales = byId('totales');
@@ -160,9 +169,9 @@
       return;
     }
     const items = agruparCarrito(cart);
-    let sub = 0;
+    let sub=0;
     wrap.innerHTML = items.map(it=>{
-      const l = it.precio*it.cantidad; sub+=l;
+      const l=it.precio*it.cantidad; sub+=l;
       return `<p>${escapeHtml(it.nombre)} — ${it.cantidad} × ${money(it.precio)} = <strong>${money(l)}</strong></p>`;
     }).join('');
     const iva=sub*IVA, total=sub+iva;
@@ -202,7 +211,7 @@
       banco: meta.banco || null,
       nota: meta.nota || '',
       creadoEn: nowISO(),
-      asignaciones: {}
+      asignaciones: {} // sku -> [codes]
     };
     const orders = getOrders(); orders.unshift(order); setOrders(orders);
     return order;
@@ -217,7 +226,6 @@
     window.open(`https://wa.me/${WSP_NUM}?text=${encodeURIComponent(msg)}`,'_blank');
     setCart([]); renderCart();
   }
-
   function pagarTransferFlow(nota){
     const bancoSel = byId('transfer-bank');
     const banco = bancoSel ? bancoSel.value : 'Cuscatlán';
@@ -225,14 +233,12 @@
     alert(`Pedido creado. Banco: ${banco}. Envía tu comprobante por WhatsApp para verificarlo.`);
     setCart([]); renderCart();
   }
-
   function procesarPago(){
     if(getCart().length===0){ alert('Tu carrito está vacío.'); return; }
     const metodo = [...document.querySelectorAll('input[name="paymethod"]')].find(r=>r.checked)?.value || 'whatsapp';
     const nota = (byId('buyer-note')?.value || '').trim();
     if(metodo==='transfer') pagarTransferFlow(nota); else pagarWhatsAppFlow(nota);
   }
-
   function updateTransferVisibility(){
     const method = [...document.querySelectorAll('input[name="paymethod"]')].find(r=>r.checked)?.value;
     const panel = byId('transfer-form');
@@ -254,13 +260,17 @@
            <li><strong>Banco:</strong> Banco Agrícola</li>
            <li><strong>Cuenta:</strong> 3710993183 (Ahorros)</li>`;
     }
+    if(e.target.id==='orders-filter'){ renderPedidos(); }
+    if(e.target.id==='codes-file' && e.target.files?.[0]) importarCSV(e.target.files[0]);
   });
 
+  // ======= CONTACTO =======
   function enviarWhatsAppContacto(){
     const t = (byId('contact-msg')?.value || '').trim() || 'Hola, necesito ayuda.';
     window.open(`https://wa.me/${WSP_NUM}?text=${encodeURIComponent(t)}`,'_blank');
   }
 
+  // ======= AUTH =======
   async function hash(t){
     try{
       const enc = new TextEncoder().encode(t);
@@ -274,15 +284,13 @@
     $('#tab-login')?.classList.add('active'); $('#tab-register')?.classList.remove('active');
     byId('login-form')?.style && (byId('login-form').style.display='grid');
     byId('register-form')?.style && (byId('register-form').style.display='none');
-    $('#tab-login')?.setAttribute('aria-selected','true');
-    $('#tab-register')?.setAttribute('aria-selected','false');
+    $('#tab-login')?.setAttribute('aria-selected','true'); $('#tab-register')?.setAttribute('aria-selected','false');
   }
   function mostrarRegistro(){
     $('#tab-register')?.classList.add('active'); $('#tab-login')?.classList.remove('active');
     byId('register-form')?.style && (byId('register-form').style.display='grid');
     byId('login-form')?.style && (byId('login-form').style.display='none');
-    $('#tab-register')?.setAttribute('aria-selected','true');
-    $('#tab-login')?.setAttribute('aria-selected','false');
+    $('#tab-register')?.setAttribute('aria-selected','true'); $('#tab-login')?.setAttribute('aria-selected','false');
   }
   async function registrar(){
     const name = (byId('reg-name')?.value || '').trim();
@@ -321,19 +329,19 @@
   }
   function actualizarUIAuth(){
     const sess = getSess();
-    const btn = byId('auth-btn');
-    const adminBtn = byId('admin-open');
+    const btn = byId('auth-btn'); const adminBtn = byId('admin-open');
     if(sess){
-      if(btn){ btn.textContent = `👤 ${sess.name || sess.email}`; btn.onclick = () => { if(confirm('¿Cerrar sesión?')) logout(); }; }
+      if(btn){ btn.textContent = `👤 ${sess.name || sess.email}`; btn.setAttribute('data-open','auth'); }
       if(adminBtn) adminBtn.style.display = sess.isAdmin ? 'inline-block' : 'none';
       const span = byId('admin-session-email'); if(span) span.textContent = sess.email;
     }else{
-      if(btn){ btn.textContent = '👤 Acceder'; btn.onclick = abrirAuth; }
+      if(btn){ btn.textContent = '👤 Acceder'; btn.setAttribute('data-open','auth'); }
       if(adminBtn) adminBtn.style.display = 'none';
       const span = byId('admin-session-email'); if(span) span.textContent = '-';
     }
   }
 
+  // ======= ADMIN =======
   function renderPedidos(){
     const list = byId('orders-list'); if(!list) return;
     const filter = $('#orders-filter')?.value || 'ALL';
@@ -351,14 +359,22 @@
         ${o.nota?`<div class="small"><em>Nota:</em> ${escapeHtml(o.nota)}</div>`:''}
         <div class="row">
           <label>Estado:</label>
-          <select onchange="cambiarEstado('${o.id}', this.value)">
+          <select data-change-estado="${o.id}">
             ${['PENDIENTE','PAGADO','ENTREGADO','CANCELADO'].map(s=>`<option value="${s}" ${o.estado===s?'selected':''}>${s}</option>`).join('')}
           </select>
-          <button class="secundario-btn" onclick="enviarWhatsDePedido('${o.id}')">Enviar por WhatsApp</button>
+          <button class="btn" data-send-whats="${o.id}">Enviar por WhatsApp</button>
         </div>`;
       list.appendChild(d);
     });
   }
+  addEventListener('change', e=>{
+    const id = e.target.getAttribute?.('data-change-estado');
+    if(id){ cambiarEstado(id, e.target.value); }
+  });
+  addEventListener('click', e=>{
+    const id = e.target.getAttribute?.('data-send-whats');
+    if(id){ enviarWhatsDePedido(id); }
+  });
   function cambiarEstado(id,estado){
     const orders = getOrders();
     const i = orders.findIndex(o=>o.id===id);
@@ -389,6 +405,7 @@
     });
   }
 
+  // ======= CÓDIGOS DIGITALES =======
   function parseCSV(text){
     const lines=text.split(/\r?\n/).filter(Boolean);
     const [h,...rows]=lines;
@@ -469,10 +486,8 @@
     }
     setOrders(orders); alert('Código asignado'); renderPedidos();
   }
-  addEventListener('change', e=>{
-    if(e.target.id==='codes-file' && e.target.files?.[0]) importarCSV(e.target.files[0]);
-  });
 
+  // ======= CATÁLOGO =======
   function renderGiftCards(){
     const c = byId('giftcards-grid'); if(!c) return;
     c.innerHTML = '';
@@ -495,31 +510,8 @@
     });
   }
 
-  function ensureProductModal(){
-    if(byId('product-modal')) return;
-    const box = document.createElement('div');
-    box.className = 'modal'; box.id = 'product-modal';
-    box.setAttribute('role','dialog'); box.setAttribute('aria-modal','true'); box.setAttribute('aria-labelledby','product-title');
-    box.innerHTML = `
-      <div class="modal-content">
-        <button class="close" data-close aria-label="Cerrar">×</button>
-        <div class="product-detail">
-          <img id="product-logo" alt="" style="max-height:72px;object-fit:contain;">
-          <h3 id="product-title">Producto</h3>
-          <div class="small" id="product-brand"></div>
-          <p id="product-desc" class="small"></p>
-          <label for="product-amount">Selecciona un monto:</label>
-          <select id="product-amount"></select>
-          <div class="btn-row">
-            <button class="btn btn-cart" id="product-add">Agregar al carrito</button>
-            <button class="btn pagar-wsp-btn" id="product-buy">Comprar ahora</button>
-          </div>
-        </div>
-      </div>`;
-    document.body.appendChild(box);
-  }
+  // Ficha de producto
   function abrirFichaProducto(id){
-    ensureProductModal();
     const prod = giftcards.find(g=>g.id===id); if(!prod) return;
     const logo  = byId('product-logo'),
           title = byId('product-title'),
@@ -533,96 +525,88 @@
     if(amount) amount.innerHTML = prod.montos.map(m=>`<option value="${m}">${money(m)}</option>`).join('');
     const addBtn = byId('product-add'), buyBtn = byId('product-buy');
     if(addBtn) addBtn.onclick = ()=>{ const m=Number(byId('product-amount').value); agregarAlCarrito(prod.id, prod.nombre, m); };
-    if(buyBtn) buyBtn.onclick = ()=>{ const m=Number(byId('product-amount').value); setCart([{id:prod.id, nombre:prod.nombre, precio:m}]); renderCart(); abrirCarrito(); };
+    if(buyBtn) buyBtn.onclick = ()=>{ const m=Number(byId('product-amount').value); setCart([{id:prod.id, nombre:prod.nombre, precio:m}]); renderCart(); openModal('carrito-modal'); };
     openModal('product-modal');
   }
 
-  function ensureOrdersModal(){
-    if(byId('orders-modal')) return;
-    const box = document.createElement('div');
-    box.className='modal'; box.id='orders-modal';
-    box.setAttribute('role','dialog'); box.setAttribute('aria-modal','true'); box.setAttribute('aria-labelledby','orders-title');
-    box.innerHTML = `
-      <div class="modal-content">
-        <button class="close" data-close aria-label="Cerrar">×</button>
-        <h2 id="orders-title">📦 Mis pedidos</h2>
-        <div id="my-orders"></div>
-      </div>`;
-    document.body.appendChild(box);
-  }
+  // ======= MIS PEDIDOS =======
   function renderMisPedidos(){
-    ensureOrdersModal();
-    const cont = byId('my-orders'); if(!cont) return;
+    const cont = document.getElementById('my-orders');
+    if(!cont) return;
+
     const sess = getSess();
     const mine = getOrders().filter(o=>o.userEmail===(sess?.email||'invitado'));
-    if(mine.length===0){ cont.innerHTML = '<p class="small">Aún no tienes pedidos.</p>'; return; }
-    cont.innerHTML = mine.map(o=>{
-      const items = o.items.map(it=>{
-        const codes = o.asignaciones?.[it.id]||[];
-        const canReveal = (o.estado==='PAGADO'||o.estado==='ENTREGADO') && codes.length>0;
-        const codeHtml = canReveal
-          ? `<div class="code" data-code="${codes.join(' | ')}">•••• •••• •••• ••••</div>
-             <div class="btn-row">
-               <button class="btn" data-reveal>Mostrar códigos</button>
-               <button class="btn" data-copy hidden>Copiar</button>
-             </div>`
-          : `<div class="code">En proceso…</div>`;
-        return `
-          <div class="order-item">
-            <div class="info">
-              <strong>${escapeHtml(it.nombre)} × ${it.cantidad}</strong>
-              <span class="small">SKU: ${escapeHtml(it.id)}</span>
-            </div>
-            <div class="actions">${codeHtml}</div>
-          </div>`;
-      }).join('');
-      return `
-        <div class="order-row">
-          <header>
-            <strong>${o.id}</strong>
-            <span class="badge status-${o.estado}">${o.estado}</span>
-            <span class="small">${new Date(o.creadoEn).toLocaleString()}</span>
-          </header>
-          ${items}
-        </div>`;
-    }).join('');
 
-    cont.querySelectorAll('[data-reveal]').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        const wrap = btn.closest('.actions');
-        const box = wrap.querySelector('.code');
-        const copy = wrap.querySelector('[data-copy]');
-        box.textContent = box.getAttribute('data-code') || box.textContent;
-        copy.hidden = false;
+    cont.innerHTML = '';
+    if(mine.length === 0){
+      cont.innerHTML = '<p class="small">Aún no tienes pedidos.</p>';
+      return;
+    }
+
+    const rowTpl  = document.getElementById('order-row-tpl');
+    const itemTpl = document.getElementById('order-item-tpl');
+
+    mine.forEach(o=>{
+      const row = rowTpl.content.cloneNode(true);
+      row.querySelector('[data-fn="order-number"]').textContent = o.id;
+      row.querySelector('[data-fn="order-date"]').textContent   = new Date(o.creadoEn).toLocaleString();
+      const st = row.querySelector('[data-fn="order-status"]');
+      st.textContent = o.estado;
+      st.classList.add('badge', `status-${o.estado}`);
+
+      const itemsWrap = row.querySelector('[data-fn="order-items"]');
+
+      o.items.forEach(it=>{
+        const iNode = itemTpl.content.cloneNode(true);
+        iNode.querySelector('[data-fn="item-name"]').textContent = `${it.nombre} × ${it.cantidad}`;
+        iNode.querySelector('[data-fn="item-sku"]').textContent  = it.id;
+
+        const codes = o.asignaciones?.[it.id] || [];
+        const fulfilled = (codes.length >= (it.cantidad||1));
+        const ff = fulfilled ? 'FULFILLED' : (codes.length>0 ? 'PARCIAL' : 'PENDIENTE');
+
+        const ffBox = iNode.querySelector('[data-fn="item-ff-status"]');
+        ffBox.innerHTML = `Estado de cumplimiento: <span class="badge ${ff==='FULFILLED'?'success':ff==='PARCIAL'?'warn':'info'}">${ff}</span>`;
+
+        const codeBox = iNode.querySelector('[data-fn="code-mask"]');
+        const btnReveal = iNode.querySelector('[data-fn="btn-reveal"]');
+        const btnCopy   = iNode.querySelector('[data-fn="btn-copy"]');
+        const puedeRevelar = (o.estado==='PAGADO' || o.estado==='ENTREGADO') && codes.length>0;
+
+        if(puedeRevelar){
+          codeBox.textContent = '•••• •••• •••• ••••';
+          codeBox.setAttribute('data-code', codes.join(' | '));
+          btnReveal.hidden = false;
+        }else{
+          codeBox.textContent = 'En proceso…';
+          btnReveal.hidden = true;
+          btnCopy.hidden = true;
+        }
+
+        itemsWrap.appendChild(iNode);
       });
-    });
-    cont.querySelectorAll('[data-copy]').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        const box = btn.closest('.actions').querySelector('.code');
-        navigator.clipboard.writeText(box.textContent||'');
-        btn.textContent='Copiado ✓'; setTimeout(()=>btn.textContent='Copiar',1200);
-      });
+
+      cont.appendChild(row);
     });
   }
 
+  // ======= SLIDESHOW =======
   function initSlideshow(){
-    const slideshowIds = ['amazon','psn','google','xbox','spotify','netflix','disney','steam'];
-    let slideIndex=0, timer=null;
-
-    const dots = byId('slide-dots'); const card = byId('slide-card');
-    const bgEl = byId('slide-bg'); const prev = byId('slide-prev'); const next = byId('slide-next');
-    const ss = byId('slideshow');
-    if(!dots || !card || !bgEl || !prev || !next || !ss) return;
+    const ids = ['amazon','psn','google','xbox','spotify','netflix','disney','steam'];
+    let i=0, timer=null;
+    const dots = byId('slide-dots'), card = byId('slide-card'), bgEl = byId('slide-bg');
+    const prev = byId('slide-prev'), next = byId('slide-next'), ss = byId('slideshow');
+    if(!dots||!card||!bgEl||!prev||!next||!ss) return;
 
     dots.innerHTML='';
-    slideshowIds.forEach((_,i)=>{
-      const b = document.createElement('button');
-      b.setAttribute('aria-label', `Ir a la diapositiva ${i+1}`);
-      b.addEventListener('click',()=>{ slideIndex=i; pintar(); start(); });
+    ids.forEach((_,k)=>{
+      const b=document.createElement('button');
+      b.setAttribute('aria-label',`Ir a la diapositiva ${k+1}`);
+      b.addEventListener('click',()=>{ i=k; pintar(); start(); });
       dots.appendChild(b);
     });
 
-    function setSlideBackground(id){
+    function setBg(id){
       const [c1,c2] = brandBg[id] || ['#7c5cff','#2ee6a6'];
       bgEl.classList.remove('show');
       bgEl.style.setProperty('--c1',c1);
@@ -631,49 +615,91 @@
       bgEl.classList.add('show');
     }
     function pintar(){
-      const id = slideshowIds[slideIndex];
-      const it = giftcards.find(g=>g.id===id);
-      if(!it) return;
-      setSlideBackground(id);
+      const id=ids[i]; const it=giftcards.find(g=>g.id===id); if(!it) return;
+      setBg(id);
       card.classList.remove('active');
       card.innerHTML = `
         <img src="${it.logo}" alt="${escapeHtml(it.nombre)}" onerror="this.onerror=null; this.src='img/cards/default.svg'">
         <h3>${escapeHtml(it.nombre)}</h3>
         <p>${escapeHtml(descripciones[id]||'')}</p>`;
-      void card.offsetWidth;
-      card.classList.add('active');
-      dots.querySelectorAll('button').forEach((b,i)=>b.classList.toggle('active', i===slideIndex));
+      void card.offsetWidth; card.classList.add('active');
+      dots.querySelectorAll('button').forEach((b,idx)=>b.classList.toggle('active', idx===i));
     }
-    function start(){ if(timer) clearInterval(timer); timer=setInterval(()=>{ slideIndex=(slideIndex+1)%slideshowIds.length; pintar(); }, 3000); }
+    function start(){ if(timer) clearInterval(timer); timer=setInterval(()=>{ i=(i+1)%ids.length; pintar(); }, 3000); }
     function stop(){ if(timer) clearInterval(timer); }
 
-    next.addEventListener('click',()=>{ slideIndex=(slideIndex+1)%slideshowIds.length; pintar(); start(); });
-    prev.addEventListener('click',()=>{ slideIndex=(slideIndex-1+slideshowIds.length)%slideshowIds.length; pintar(); start(); });
+    next.addEventListener('click',()=>{ i=(i+1)%ids.length; pintar(); start(); });
+    prev.addEventListener('click',()=>{ i=(i-1+ids.length)%ids.length; pintar(); start(); });
     ss.addEventListener('mouseenter', stop);
     ss.addEventListener('mouseleave', start);
 
     pintar(); start();
   }
 
+  // ======= HEADER scroll =======
   function initHeaderScroll(){
     const bar = $('.top-bar'); if(!bar) return;
     const onScroll = () => bar.classList.toggle('is-scrolled', window.scrollY>10);
     onScroll(); window.addEventListener('scroll', onScroll, {passive:true});
   }
 
+  // ======= DELEGACIÓN GLOBAL =======
+  // data-open: abrir modales
   addEventListener('click', e=>{
-    const openAttr = e.target.closest?.('[data-open]')?.getAttribute('data-open');
-    if(openAttr){
-      e.preventDefault();
-      if(openAttr==='orders'){ renderMisPedidos(); }
-      if(openAttr==='admin'){ const s=getSess(); if(!(s?.isAdmin)) return openModal('auth-modal'); }
-      if(openAttr==='product'){ /* se abre desde abrirFichaProducto */ }
-      openModal(`${openAttr}-modal`);
-      return;
-    }
-    if(e.target.matches('[data-close]')){ const m=e.target.closest('.modal'); m&&modal(m,false); }
+    const opener = e.target.closest?.('[data-open]');
+    if(!opener) return;
+    e.preventDefault();
+    const target = opener.getAttribute('data-open');
+    if(target==='orders'){ renderMisPedidos(); }
+    if(target==='admin'){ const s=getSess(); if(!(s?.isAdmin)) return openModal('auth-modal'); else { renderPedidos(); renderUsuarios(); pintarStatsCodigos(); } }
+    if(target==='cart'){ renderCart(); }
+    openModal(`${target}-modal`);
+  });
 
-    const add = e.target.getAttribute('data-add');
+  // data-close ya se maneja con el click en fondo y este:
+  addEventListener('click', e=>{
+    if(e.target.matches('[data-close]')){ const m=e.target.closest('.modal'); m&&modal(m,false); }
+  });
+
+  // data-action: acciones principales
+  addEventListener('click', e=>{
+    const el = e.target.closest?.('[data-action]'); if(!el) return;
+    const a = el.getAttribute('data-action');
+    if(a==='wsp-contact') enviarWhatsAppContacto();
+    else if(a==='login')  login();
+    else if(a==='register') registrar();
+    else if(a==='admin-quick') adminAccesoRapido();
+    else if(a==='logout') logout();
+    else if(a==='pagar')  procesarPago();
+    else if(a==='vaciar') { setCart([]); renderCart(); }
+    else if(a==='codes-download-template') descargarPlantillaCSV();
+    else if(a==='assign-code') asignarManualCodigo();
+    else if(a==='reveal'){ // dentro de orders
+      const actions = el.closest('.actions');
+      const box = actions.querySelector('[data-fn="code-mask"]');
+      const copyBtn = actions.querySelector('[data-fn="btn-copy"]');
+      const real = box.getAttribute('data-code') || '';
+      if(real){ box.textContent = real; copyBtn.hidden = false; }
+    }
+    else if(a==='copy'){
+      const actions = el.closest('.actions');
+      const box = actions.querySelector('[data-fn="code-mask"]');
+      navigator.clipboard.writeText(box.textContent || '');
+      el.textContent = 'Copiado ✓'; setTimeout(()=>el.textContent='Copiar',1200);
+    }
+  });
+
+  // Auth tabs
+  addEventListener('click', e=>{
+    const tabBtn = e.target.closest?.('[data-auth-tab]'); if(!tabBtn) return;
+    const which = tabBtn.getAttribute('data-auth-tab');
+    if(which==='login') mostrarLogin();
+    if(which==='register') mostrarRegistro();
+  });
+
+  // Catálogo (agregar / ver detalles)
+  addEventListener('click', e=>{
+    const add = e.target.getAttribute?.('data-add');
     if(add){
       const selId = e.target.getAttribute('data-sel');
       const sel = byId(selId);
@@ -682,40 +708,15 @@
       agregarAlCarrito(add, nombre, monto);
       return;
     }
-    const view = e.target.getAttribute('data-view');
+    const view = e.target.getAttribute?.('data-view');
     if(view){ abrirFichaProducto(view); }
   });
 
-  window.abrirCarrito  = () => { renderCart(); openModal('carrito-modal'); };
-  window.cerrarCarrito = () => closeModal('carrito-modal');
-  window.procesarPago  = procesarPago;
+  // ======= BACKWARD COMPAT (por si algo viejo lo llama) =======
+  window.abrirAdmin = () => { const s=getSess(); if(!(s?.isAdmin)){ openModal('auth-modal'); return; } openModal('admin-modal'); renderPedidos(); renderUsuarios(); pintarStatsCodigos(); };
 
-  window.abrirContacto = () => openModal('contacto-modal');
-  window.cerrarContacto= () => closeModal('contacto-modal');
-  window.enviarWhatsAppContacto = enviarWhatsAppContacto;
-
-  window.abrirAuth     = () => openModal('auth-modal');
-  window.cerrarAuth    = () => closeModal('auth-modal');
-  window.mostrarLogin  = mostrarLogin;
-  window.mostrarRegistro = mostrarRegistro;
-  window.registrar     = registrar;
-  window.login         = login;
-  window.logout        = logout;
-  window.adminAccesoRapido = adminAccesoRapido;
-  window.actualizarUIAuth   = actualizarUIAuth;
-
-  window.abrirAdmin    = () => { const s=getSess(); if(!(s?.isAdmin)){ openModal('auth-modal'); return; } openModal('admin-modal'); renderPedidos(); renderUsuarios(); pintarStatsCodigos(); };
-  window.cerrarAdmin   = () => closeModal('admin-modal');
-  window.renderPedidos = renderPedidos;
-  window.cambiarEstado = cambiarEstado;
-  window.enviarWhatsDePedido = enviarWhatsDePedido;
-
-  window.abrirMisPedidos = () => { renderMisPedidos(); openModal('orders-modal'); };
-
+  // ======= INIT =======
   document.addEventListener('DOMContentLoaded', ()=>{
-    ensureOrdersModal();
-    ensureProductModal();
-
     actualizarUIAuth();
     initHeaderScroll();
     initSlideshow();
@@ -725,12 +726,6 @@
     const bankSelect = byId('transfer-bank');
     if(bankSelect){ bankSelect.value='Cuscatlán'; bankSelect.dispatchEvent(new Event('change')); }
     updateTransferVisibility();
-
-    document.querySelectorAll('.modal').forEach(m=>{
-      m.addEventListener('click', (e)=>{
-        if(e.target === m) modal(m,false);
-      });
-    });
   });
 
 })();
