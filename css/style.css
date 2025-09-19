@@ -110,6 +110,13 @@ img { max-width: 100%; display: block; height: auto; }
   text-shadow: 0 2px 10px rgba(124,58,237,.25);
 }
 .header-content .tagline { color: var(--muted); margin: 0 0 12px; }
+.header-content .greeting { 
+  color: var(--brand); 
+  margin: 0 0 8px; 
+  font-size: 1.1rem; 
+  font-weight: 600; 
+  opacity: 0.9;
+}
 .cta-row { display: inline-flex; gap: 10px; margin-top: 8px; }
 
 /* --- BOTONES --- */
