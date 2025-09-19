@@ -15,13 +15,13 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 48px;
+  padding: 14px 34px;
   background: #18181a;
-  box-shadow: 0 6px 24px rgba(39,201,230,0.15);
+  box-shadow: 0 2px 14px rgba(0,0,0,0.12);
   border-bottom: 2px solid #27c9e6;
 }
 .brand img {
-  height: 56px;
+  height: 40px;
   width: auto;
   margin-right: 1.4rem;
 }
@@ -33,16 +33,16 @@ nav.primary {
 nav.primary a {
   color: #fff;
   margin: 0 1rem;
-  font-weight: 700;
-  font-size: 1.18em;
+  font-weight: 600;
+  font-size: 1.12em;
   text-decoration: none;
-  border-radius: 10px;
-  padding: 5px 14px;
+  border-radius: 8px;
+  padding: 4px 10px;
   transition: color .18s, background .18s;
 }
 nav.primary a:hover, nav.primary a:focus {
   color: #27c9e6;
-  background: rgba(39,201,230,0.15);
+  background: rgba(39,201,230,0.1);
 }
 .top-actions {
   display: flex;
@@ -50,14 +50,14 @@ nav.primary a:hover, nav.primary a:focus {
   gap: 12px;
 }
 .top-actions .btn {
-  background: #fff;
-  color: #18181a;
+  background: #f5faff;
+  color: #0e6a79;
   padding: 12px 26px;
   border-radius: 999px;
   font-weight: 700;
   border: none;
   font-size: 1em;
-  box-shadow: 0 2px 18px rgba(39,201,230,0.10);
+  box-shadow: 0 2px 18px rgba(39,201,230,0.08);
   transition: background .18s, color .18s, box-shadow .18s;
   display: inline-flex;
   align-items: center;
@@ -66,40 +66,41 @@ nav.primary a:hover, nav.primary a:focus {
 .top-actions .btn.primary {
   background: linear-gradient(135deg, #27c9e6, #7c3aed);
   color: #fff;
-  box-shadow: 0 2px 14px rgba(124,58,237,0.10);
+  box-shadow: 0 2px 14px rgba(124,58,237,0.06);
 }
-.top-actions .btn:hover {
+.top-actions .btn:hover,
+.top-actions .btn:focus {
   background: #27c9e6;
   color: #fff;
-  box-shadow: 0 8px 18px rgba(39,201,230,0.20);
+  box-shadow: 0 8px 18px rgba(39,201,230,0.15);
 }
 
 /* --- HEADER CONTENT --- */
 .header-content {
   background: linear-gradient(120deg, #c6f0f9 0%, #f7fffc 100%);
   text-align: center;
-  padding: 46px 0 64px 0;
+  padding: 34px 0 46px 0;
   border-bottom: 1px solid #e2e8f0;
 }
 .header-content h1 {
-  font-size: 2.9em;
+  font-size: 2.1em;
   font-weight: 900;
   color: #7c3aed;
-  margin-bottom: 14px;
-  text-shadow: 0 2px 16px rgba(124,58,237,0.18);
+  margin-bottom: 8px;
+  text-shadow: 0 2px 10px rgba(124,58,237,0.18);
   letter-spacing: -.02em;
 }
 .header-content .tagline {
-  color: #18181a;
-  font-size: 1.22em;
+  color: #0e6a79;
+  font-size: 1.13em;
   font-weight: 500;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   letter-spacing: -.01em;
 }
 .cta-row {
   display: inline-flex;
-  gap: 24px;
-  margin-top: 12px;
+  gap: 14px;
+  margin-top: 10px;
 }
 .cta-row .btn.primary {
   font-size: 1.09em;
@@ -125,7 +126,7 @@ nav.primary a:hover, nav.primary a:focus {
 
 /* --- SLIDESHOW --- */
 .slideshow-section {
-  margin: 46px 0 24px 0;
+  margin: 44px 0 22px 0;
 }
 .slideshow {
   display: grid;
@@ -133,18 +134,18 @@ nav.primary a:hover, nav.primary a:focus {
   gap: 8px;
   align-items: center;
   background: #fff;
-  border-radius: 36px;
-  box-shadow: 0 12px 44px rgba(39,201,230,0.18);
-  padding: 28px 46px;
+  border-radius: 26px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+  padding: 20px 32px;
   position: relative;
 }
 .slide-btn {
   background: #eafafc;
   border-radius: 50%;
   border: none;
-  width: 56px;
-  height: 56px;
-  font-size: 1.6em;
+  width: 44px;
+  height: 44px;
+  font-size: 1.4em;
   color: #27c9e6;
   cursor: pointer;
   transition: background .18s, box-shadow .18s;
@@ -156,7 +157,7 @@ nav.primary a:hover, nav.primary a:focus {
   box-shadow: 0 8px 22px rgba(39,201,230,0.18);
 }
 .slide-viewport {
-  min-height: 220px;
+  min-height: 180px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -166,66 +167,58 @@ nav.primary a:hover, nav.primary a:focus {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: .77;
+  opacity: .70;
   background: linear-gradient(120deg, #7c3aed 30%, #27c9e6 70%);
-  border-radius: 30px;
-  filter: blur(22px) saturate(1.18);
+  border-radius: 22px;
+  filter: blur(20px) saturate(1.12);
   z-index: 0;
 }
 .slide-card {
   background: #fff;
-  border-radius: 28px;
-  box-shadow: 0 12px 44px rgba(39,201,230,0.14);
-  padding: 46px 36px 38px 36px;
+  border-radius: 22px;
+  box-shadow: 0 8px 32px rgba(39,201,230,0.10);
+  padding: 32px 28px 24px 28px;
   text-align: center;
   position: relative;
-  min-width: 420px;
+  min-width: 360px;
   max-width: 520px;
   z-index: 1;
   margin: 0 auto;
 }
 .slide-card img {
-  max-height: 66px;
-  margin-bottom: 14px;
+  max-height: 54px;
+  margin-bottom: 12px;
   display: inline-block;
 }
 .slide-card h3 {
-  font-size: 1.7em;
-  margin: 14px 0 12px;
+  font-size: 1.32em;
+  margin: 14px 0 10px;
   font-weight: 900;
   color: #7c3aed;
 }
 .slide-card p {
   margin-bottom: 18px;
-  color: #18181a;
+  color: #0e6a79;
   font-weight: 500;
-  font-size: 1.1em;
 }
 .slide-card .tag {
   position: absolute;
-  top: 26px;
-  left: 28px;
-  background: #27c9e6;
-  color: #fff;
-  border-radius: 12px;
-  font-size: 0.90em;
-  font-weight: 700;
-  padding: 6px 18px;
-  box-shadow: 0 2px 8px rgba(39,201,230,0.17);
+  top: 22px;
+  left: 22px;
 }
 
 /* --- SLIDE DOTS --- */
 .slide-dots {
   display: flex;
   justify-content: center;
-  gap: 12px;
-  margin-top: 22px;
+  gap: 8px;
+  margin-top: 14px;
 }
 .slide-dots button {
-  width: 11px;
-  height: 11px;
+  width: 9px;
+  height: 9px;
   border-radius: 999px;
-  border: 2px solid #27c9e6;
+  border: 1px solid #27c9e6;
   background: #eafafc;
   cursor: pointer;
   transition: background .18s, border-color .18s;
@@ -238,51 +231,51 @@ nav.primary a:hover, nav.primary a:focus {
 /* --- CATÁLOGO DE GIFT CARDS --- */
 .grid {
   display: grid;
-  gap: 32px;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  padding: 1.5rem 0;
+  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  padding: 1rem 0;
   justify-content: center;
 }
 .card, .giftcard-card {
   background: #fff;
-  border-radius: 32px;
-  box-shadow: 0 12px 44px rgba(39,201,230,0.18);
-  padding: 32px 22px 38px 22px;
+  border-radius: 26px;
+  box-shadow: 0 8px 32px rgba(39,201,230,0.15);
+  padding: 22px 16px 28px 16px;
   text-align: center;
   position: relative;
   transition: transform 0.19s, box-shadow 0.19s;
   min-width: 220px;
-  max-width: 370px;
+  max-width: 340px;
   margin: 0 auto;
   overflow: hidden;
 }
 .card:hover, .giftcard-card:hover {
-  transform: scale(1.055) translateY(-10px);
-  box-shadow: 0 22px 54px rgba(124,58,237,0.15);
+  transform: scale(1.045) translateY(-6px);
+  box-shadow: 0 16px 42px rgba(124,58,237,0.13);
 }
 .card img, .giftcard-card img {
-  width: 110px;
-  border-radius: 24px;
-  margin-bottom: 16px;
+  width: 90px;
+  border-radius: 18px;
+  margin-bottom: 10px;
   background: #f1f5fb;
-  padding: 22px 0 12px 0;
+  padding: 18px 0 8px 0;
   display: inline-block;
 }
 .card h3, .giftcard-card h3 {
-  margin: 24px 0 10px;
-  font-size: 1.27em;
+  margin: 18px 0 8px;
+  font-size: 1.17em;
   color: #7c3aed;
   font-weight: bold;
 }
 .card p, .giftcard-card p {
-  color: #18181a;
+  color: #0e6a79;
   margin-bottom: 18px;
   font-weight: 500;
 }
 .card .tag, .giftcard-card .tag {
   position: absolute;
-  top: 22px;
-  left: 22px;
+  top: 16px;
+  left: 16px;
   background: #27c9e6;
   color: #fff;
   border-radius: 12px;
@@ -299,7 +292,7 @@ nav.primary a:hover, nav.primary a:focus {
   color: #fff;
   border: none;
   border-radius: 22px;
-  padding: 13px 38px;
+  padding: 11px 34px;
   font-size: 1.1em;
   font-weight: bold;
   margin-top: 0;
@@ -309,7 +302,7 @@ nav.primary a:hover, nav.primary a:focus {
 }
 .btn.primary:hover {
   background: linear-gradient(135deg, #7c3aed, #27c9e6);
-  transform: translateY(-2px) scale(1.06);
+  transform: translateY(-2px) scale(1.05);
   box-shadow: 0 8px 22px rgba(124,58,237,0.16);
 }
 .btn {
@@ -332,17 +325,17 @@ nav.primary a:hover, nav.primary a:focus {
 /* --- MODALES Y FOOTER --- */
 .modal-content {
   background: #fff !important;
-  border-radius: 24px;
-  box-shadow: 0 20px 54px rgba(39,201,230,0.17);
+  border-radius: 18px;
+  box-shadow: 0 20px 50px rgba(39,201,230,0.12);
 }
 footer {
-  border-top: 2px solid #e2e8f0;
+  border-top: 1px solid #e2e8f0;
   background: #fff;
   color: #475569;
-  padding: 32px 0 18px 0;
+  padding: 24px 0 14px 0;
   text-align: center;
-  font-size: 1.05em;
-  margin-top: 54px;
+  font-size: 1em;
+  margin-top: 44px;
 }
 
 /* --- RESPONSIVE --- */
@@ -358,6 +351,9 @@ footer {
   .card img, .giftcard-card img { height: 58px; padding: 10px 2px 8px 2px; }
   .card, .giftcard-card { min-height: 150px; padding: 8px 6px 12px 6px; }
   .slide-card { min-width: 0; max-width: 98vw; padding: 25px 10px 20px 10px; }
+  body {
+    font-size: 0.9em;
+  }
 }
 
 /* --- SCROLLBARS --- */
