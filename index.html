@@ -17,8 +17,8 @@
   <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
   <link rel="apple-touch-icon" href="img/icon-192.png">
 
-  <link rel="stylesheet" href="css/style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/g2a-redesign.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
 
 </head>
@@ -30,32 +30,54 @@
       <a href="#" class="brand" aria-label="Inicio">
         <img src="img/logo.svg" alt="Tati Shop" width="160" height="40" loading="eager" />
       </a>
+      
+      <div class="search-container">
+        <input type="text" class="search-bar" placeholder="Buscar gift cards..." id="search-input">
+        <button class="search-btn" aria-label="Buscar">
+          <i class="bi bi-search"></i>
+        </button>
+      </div>
+      
       <nav class="primary" aria-label="Principal">
         <a href="#catalogo">Catálogo</a>
         <a href="#" data-open="orders" role="button">Mis pedidos</a>
       </nav>
+      
       <div class="top-actions" role="navigation" aria-label="Acciones rápidas">
         <button class="btn" data-open="contact"><i class="bi bi-whatsapp"></i> Contacto</button>
         <button class="btn" id="auth-btn" data-open="auth"><i class="bi bi-person"></i> Acceder</button>
         <button class="btn" id="admin-open" data-open="admin" style="display:none;"><i class="bi bi-tools"></i> Admin</button>
         <button class="btn primary" data-open="cart" aria-haspopup="dialog" aria-controls="carrito-modal">
-          <i class="bi bi-gift"></i> Ver Carrito (<span id="cart-count" aria-live="polite">0</span>)
+          <i class="bi bi-cart3"></i> Carrito (<span id="cart-count" aria-live="polite">0</span>)
         </button>
       </div>
     </div>
 
+    <nav class="category-nav" aria-label="Categorías">
+      <div class="category-list">
+        <a href="#" class="category-item active" data-category="all">Todos</a>
+        <a href="#" class="category-item" data-category="gaming">Gaming</a>
+        <a href="#" class="category-item" data-category="streaming">Streaming</a>
+        <a href="#" class="category-item" data-category="shopping">Compras</a>
+        <a href="#" class="category-item" data-category="lifestyle">Estilo de vida</a>
+      </div>
+    </nav>
+
     <div class="header-content" id="home">
-      <h1>🎁 Gift Cards Tati Shop</h1>
-      <p class="tagline">Elige, regala, sorprende — digital y al instante</p>
+      <h1>🎮 Gaming & Digital Store</h1>
+      <p class="tagline">Descubre miles de gift cards digitales - Entrega inmediata</p>
       <div class="cta-row" role="group" aria-label="Acciones principales">
-        <a href="#catalogo" class="btn primary">Ver catálogo</a>
-        <button class="btn" data-open="auth">Crear cuenta</button>
+        <a href="#catalogo" class="btn primary">Explorar Catálogo</a>
+        <button class="btn secondary" data-open="auth">Crear Cuenta</button>
       </div>
     </div>
   </header>
 
   <section class="slideshow-section" aria-labelledby="destacados-title">
-    <h2 id="destacados-title" class="sr-only">Gift cards destacadas</h2>
+    <div class="slideshow-header">
+      <h2 id="destacados-title">Gift Cards Destacadas</h2>
+      <p>Las mejores ofertas en entretenimiento digital</p>
+    </div>
     <div class="slideshow" id="slideshow" role="region" aria-roledescription="carrusel" aria-label="Promociones" aria-live="polite">
       <button class="slide-btn prev" id="slide-prev" aria-label="Anterior" aria-controls="slide-viewport">&#10094;</button>
       <div class="slide-viewport" id="slide-viewport">
@@ -68,10 +90,11 @@
   </section>
 
   <main id="contenido" tabindex="-1">
-    <section aria-labelledby="catalogo-title">
-      <h2 id="catalogo-title">Catálogo</h2>
-      <div class="grid" id="giftcards-grid" role="list"></div>
-    </section>
+    <div class="section-header">
+      <h2 id="catalogo-title">Catálogo de Gift Cards</h2>
+      <a href="#" class="view-all">Ver todo <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <div class="grid" id="giftcards-grid" role="list"></div>
   </main>
 
   <footer role="contentinfo">

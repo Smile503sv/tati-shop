@@ -465,27 +465,57 @@
   }
 
 
-  function renderGiftCards(){
+  // Add category mapping
+  const cardCategories = {
+    amazon: "shopping", google: "gaming", psn: "gaming", xbox: "gaming", 
+    steam: "gaming", apple: "shopping", spotify: "streaming", netflix: "streaming",
+    disney: "streaming", uber: "lifestyle", airbnb: "lifestyle", starbucks: "lifestyle",
+    tiktok: "lifestyle", epicgames: "gaming", nike: "shopping", adidas: "shopping",
+    sephora: "shopping", walmart: "shopping", target: "shopping", bestbuy: "shopping",
+    hbo: "streaming", homeDepot: "shopping", lowes: "shopping", rolex: "lifestyle",
+    discord: "gaming", facebook: "lifestyle", roblox: "gaming", visa: "shopping", 
+    mastercard: "shopping"
+  };
+
+  const categoryNames = {
+    gaming: "Gaming",
+    streaming: "Streaming", 
+    shopping: "Compras",
+    lifestyle: "Estilo de vida"
+  };
+
+  function renderGiftCards(filterCategory = 'all'){
     const c = document.getElementById("giftcards-grid");
     if(!c) return;
     c.innerHTML = "";
-    giftcards.forEach(gc=>{
+    
+    const filteredCards = filterCategory === 'all' 
+      ? giftcards 
+      : giftcards.filter(gc => cardCategories[gc.id] === filterCategory);
+    
+    filteredCards.forEach(gc=>{
       const selectId = `select-${gc.id}`;
+      const category = cardCategories[gc.id] || 'lifestyle';
       const d = document.createElement("div");
       d.className = "card";
       d.innerHTML = `
-        <img src="${gc.logo}"
-             alt="${escapeHtml(gc.nombre)}"
-             referrerpolicy="no-referrer" crossorigin="anonymous"
-             onerror="this.onerror=null; this.src='img/cards/default.svg'">
-        <h3>${escapeHtml(gc.nombre)}</h3>
-        <p>${escapeHtml(descripciones[gc.id] || "Selecciona un monto:")}</p>
-        <select id="${selectId}">
-          ${gc.montos.map(m=>`<option value="${m}">${money(m)}</option>`).join("")}
-        </select>
-        <div class="row">
-          <button class="buy-btn" data-add="${gc.id}" data-name="${escapeHtml(gc.nombre)}" data-select="${selectId}">Agregar al carrito</button>
-          <button class="btn btn-cart" data-buy-now="${gc.id}" data-name="${escapeHtml(gc.nombre)}" data-select="${selectId}">Comprar ya</button>
+        <div class="card-image">
+          <span class="tag ${category}">${categoryNames[category] || 'General'}</span>
+          <img src="${gc.logo}"
+               alt="${escapeHtml(gc.nombre)}"
+               referrerpolicy="no-referrer" crossorigin="anonymous"
+               onerror="this.onerror=null; this.src='img/default.svg'">
+        </div>
+        <div class="card-content">
+          <h3>${escapeHtml(gc.nombre)}</h3>
+          <p>${escapeHtml(descripciones[gc.id] || "Selecciona un monto:")}</p>
+          <select id="${selectId}">
+            ${gc.montos.map(m=>`<option value="${m}">${money(m)}</option>`).join("")}
+          </select>
+          <div class="row">
+            <button data-add="${gc.id}" data-name="${escapeHtml(gc.nombre)}" data-select="${selectId}">Agregar</button>
+            <button class="primary" data-buy-now="${gc.id}" data-name="${escapeHtml(gc.nombre)}" data-select="${selectId}">Comprar</button>
+          </div>
         </div>
       `;
       c.appendChild(d);
@@ -625,6 +655,45 @@
     });
   }
 
+  // Search functionality
+  function initSearch() {
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        searchGiftCards(query);
+      });
+    }
+  }
+
+  function searchGiftCards(query) {
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+      const title = card.querySelector('h3')?.textContent.toLowerCase() || '';
+      const description = card.querySelector('p')?.textContent.toLowerCase() || '';
+      const isVisible = !query || title.includes(query) || description.includes(query);
+      card.style.display = isVisible ? 'block' : 'none';
+    });
+  }
+
+  // Category filtering
+  function initCategoryFilters() {
+    const categoryItems = document.querySelectorAll('.category-item');
+    categoryItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        // Update active state
+        categoryItems.forEach(cat => cat.classList.remove('active'));
+        item.classList.add('active');
+        
+        // Filter cards
+        const category = item.getAttribute('data-category');
+        renderGiftCards(category);
+      });
+    });
+  }
+
 
   document.addEventListener("click",(e)=>{
     const add = e.target.closest("[data-add]");
@@ -683,6 +752,8 @@
     initSlideshow();
     renderGiftCards();
     renderCart();
+    initSearch();
+    initCategoryFilters();
 
     const bankSelect = document.getElementById("transfer-bank");
     if(bankSelect){ bankSelect.value="Cuscatlán"; bankSelect.dispatchEvent(new Event("change")); }
