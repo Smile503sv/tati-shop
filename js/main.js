@@ -37,7 +37,7 @@
     { id:"adidas", nombre:"Adidas", montos:[25,50], logo:"https://cdn.coinsbee.com/version2/dist/assets/img/brands/adidas.png" },
     { id:"sephora", nombre:"Sephora", montos:[25,50,75], logo:"https://cdn.coinsbee.com/version2/dist/assets/img/brands/Sephora.png" },
     { id:"walmart", nombre:"Walmart", montos:[20,40,100], logo:"https://cdn.coinsbee.com/version2/dist/assets/img/brands/Walmart.png" },
-    { id:"target", nombre:"Target", montos:[20,50], logo:"https://cdn.coinsbee.com/version2/dist/assets/img/brands/Target.webp" },
+    { id:"target", nombre:"Target", montos:[20,50], logo:"https://www.giftcards.com/content/dam/bhn/live/nam/us/en/catalog-assets/product-images/07675015835/07675015835_72786_master.png/_jcr_content/renditions/cq5dam.zoom.2048.2048.jpeg" },
     { id:"bestbuy", nombre:"Best Buy", montos:[25,50], logo:"https://cdn.coinsbee.com/version2/dist/assets/img/brands/Best-Buy.webp" },
     { id:"hbo", nombre:"HBO Max", montos:[30,50], logo:"https://cdn.coinsbee.com/version2/dist/assets/img/brands/HBO.png" },
     { id:"homeDepot", nombre:"Home Depot", montos:[50,100], logo:"https://images.thdstatic.com/giftcards/catalog/53L1QLAXWKVF06WJ8DLHBYT6S8/xxlarge/RH6VN7060A1LR3FWD0WJKNVBV8_0608202315:36:58.PNG" },
