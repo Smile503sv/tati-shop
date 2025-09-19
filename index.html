@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Gift Cards | Tati Shop</title>
-  
+
   <meta name="description" content="Gift Cards digitales al instante. Compra segura en Tati Shop y recibe tu código listo para usar." />
   <meta property="og:title" content="Gift Cards | Tati Shop" />
   <meta property="og:description" content="Compra y recibe códigos digitales al instante." />
@@ -21,43 +21,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
 
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Store",
-    "name": "Tati Shop",
-    "url": "https://tati-shop.com",
-    "logo": "https://tati-shop.com/img/logo.svg",
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "email": "ventas-online@tati-shop.com",
-      "contactType": "customer service",
-      "availableLanguage": ["es"]
-    },
-    "sameAs": ["https://wa.me/50379553318"],
-    "makesOffer": {
-      "@type": "OfferCatalog",
-      "name": "Gift Cards",
-      "itemListElement": [
-        { "@type": "Product", "name": "Google Play Gift Card", "brand": "Google Play" },
-        { "@type": "Product", "name": "PlayStation Gift Card", "brand": "Sony" },
-        { "@type": "Product", "name": "Xbox Gift Card", "brand": "Microsoft" }
-      ]
-    }
-  }
-  </script>
-
+  <!-- Ajustes mínimos para compatibilidad visual -->
   <style>
-    body{font-family:'Montserrat',system-ui,Arial,sans-serif;margin:0;background:linear-gradient(120deg,#f7fffc 0%,#c6f0f9 100%)}
-    .top-bar{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;background:rgba(39,201,230,.85)}
+    body{margin:0;font-family:'Montserrat',system-ui,Arial,sans-serif;background:linear-gradient(120deg,#f7fffc 0%,#c6f0f9 100%)}
+    .top-bar{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;background:rgba(39,201,230,.75);transition:background .2s, backdrop-filter .2s}
+    .top-bar.is-scrolled{background:rgba(39,201,230,.9);backdrop-filter:blur(8px)}
     .brand img{display:block}
     nav.primary a{margin:0 .4rem;font-weight:700;color:#0e6a79;text-decoration:none}
     .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;padding:1rem}
-    .giftcard-card{background:#fff;border-radius:16px;box-shadow:0 8px 26px rgba(39,201,230,.15);overflow:hidden}
-    .giftcard-card img{width:100%;height:145px;object-fit:cover}
     .btn{cursor:pointer;border:0;padding:.6rem 1rem;border-radius:999px;font-weight:700}
     .btn.primary{background:#27c9e6;color:#fff}
-    .modal{position:fixed;inset:0;background:rgba(39,201,230,.18);backdrop-filter:blur(8px);display:none;place-items:center;padding:1rem}
+    .modal{position:fixed;inset:0;background:rgba(39,201,230,.18);backdrop-filter:blur(8px);display:none;place-items:center;padding:1rem;z-index:9999}
     .modal.open{display:grid}
     .modal-content{background:#fff;border-radius:16px;max-width:960px;width:100%;padding:1rem;box-shadow:0 20px 50px rgba(0,0,0,.12)}
     .close{background:transparent;border:0;font-size:1.4rem;float:right}
@@ -75,7 +49,7 @@
       </a>
       <nav class="primary" aria-label="Principal">
         <a href="#catalogo">Catálogo</a>
-        <a href="#" id="orders-link" data-open="orders" role="button">Mis pedidos</a>
+        <a href="#" data-open="orders" role="button">Mis pedidos</a>
       </nav>
       <div class="top-actions" role="navigation" aria-label="Acciones rápidas">
         <button class="btn" data-open="contact"><i class="bi bi-whatsapp"></i> Contacto</button>
@@ -97,9 +71,9 @@
     </div>
   </header>
 
+  <!-- Slideshow -->
   <section class="slideshow-section" aria-labelledby="destacados-title">
     <h2 id="destacados-title" class="sr-only">Gift cards destacadas</h2>
-
     <div class="slideshow" id="slideshow" role="region" aria-roledescription="carrusel" aria-label="Promociones" aria-live="polite">
       <button class="slide-btn prev" id="slide-prev" aria-label="Anterior" aria-controls="slide-viewport">&#10094;</button>
       <div class="slide-viewport" id="slide-viewport">
@@ -123,11 +97,13 @@
     <a href="mailto:ventas-online@tati-shop.com">ventas-online@tati-shop.com</a>
   </footer>
 
+  <!-- Carrito -->
   <div class="modal" id="carrito-modal" role="dialog" aria-modal="true" aria-labelledby="carrito-title">
     <div class="modal-content">
       <button class="close" data-close aria-label="Cerrar">×</button>
       <h2 id="carrito-title">🛍️ Tu Carrito</h2>
       <div class="cart-items" id="cart-items" role="list"></div>
+
       <div class="checkout-box" aria-labelledby="pago-title">
         <h3 id="pago-title">💳 Método de pago</h3>
         <fieldset class="pay-options">
@@ -141,6 +117,7 @@
             <span>🏦 Transferencia (Cuscatlán / Agrícola)</span>
           </label>
         </fieldset>
+
         <div id="transfer-form" class="transfer-form" hidden>
           <label for="transfer-bank">Banco al que harás la transferencia:</label>
           <select id="transfer-bank">
@@ -154,10 +131,12 @@
           </div>
         </div>
       </div>
+
       <div class="checkout-box">
         <label for="buyer-note">Nota / Datos de entrega (opcional):</label>
         <textarea id="buyer-note" placeholder="Correo para envío, nombre del destinatario, mensaje en la tarjeta, etc." rows="3"></textarea>
       </div>
+
       <div class="totals" id="totales" aria-live="polite"></div>
       <div class="checkout-actions">
         <button class="btn" data-action="vaciar">🗑️ Vaciar carrito</button>
@@ -166,6 +145,7 @@
     </div>
   </div>
 
+  <!-- Contacto -->
   <div class="modal" id="contacto-modal" role="dialog" aria-modal="true" aria-labelledby="contacto-title">
     <div class="modal-content">
       <button class="close" data-close aria-label="Cerrar">×</button>
@@ -182,14 +162,17 @@
     </div>
   </div>
 
+  <!-- Auth -->
   <div class="modal" id="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-title">
     <div class="modal-content auth">
       <button class="close" data-close aria-label="Cerrar">×</button>
       <h2 id="auth-title" class="sr-only">Acceder a Tati Shop</h2>
+
       <div class="auth-tabs" role="tablist" aria-label="Autenticación">
         <button id="tab-login" class="active" data-auth-tab="login" role="tab" aria-selected="true" aria-controls="login-form">Iniciar Sesión</button>
         <button id="tab-register" data-auth-tab="register" role="tab" aria-selected="false" aria-controls="register-form">Registrarse</button>
       </div>
+
       <div id="login-form" class="auth-pane" role="tabpanel" aria-labelledby="tab-login">
         <label for="login-email">Email</label>
         <input type="email" id="login-email" placeholder="tu@email.com" autocomplete="username">
@@ -198,6 +181,7 @@
         <button class="btn primary" data-action="login">Entrar</button>
         <div class="admin-quick"><button class="btn" data-action="admin-quick">🔐 Acceso rápido Admin</button></div>
       </div>
+
       <div id="register-form" class="auth-pane" style="display:none;" role="tabpanel" aria-labelledby="tab-register">
         <label for="reg-name">Nombre</label>
         <input type="text" id="reg-name" placeholder="Tu nombre" autocomplete="name">
@@ -210,22 +194,25 @@
     </div>
   </div>
 
+  <!-- Admin -->
   <div class="modal" id="admin-modal" role="dialog" aria-modal="true" aria-labelledby="admin-title">
     <div class="modal-content admin">
       <button class="close" data-close aria-label="Cerrar">×</button>
       <h2 id="admin-title">🛠️ Panel Admin</h2>
+
       <div class="admin-header">
         <div><strong>Sesión:</strong> <span id="admin-session-email">-</span></div>
         <div class="admin-actions">
           <button class="btn" data-action="logout">Cerrar sesión</button>
         </div>
       </div>
+
       <div class="admin-panels">
         <section class="admin-panel" aria-labelledby="pedidos-title">
           <h3 id="pedidos-title">📦 Pedidos</h3>
           <div class="filters">
             <label for="orders-filter">Filtrar:</label>
-            <select id="orders-filter" data-action="filter-orders">
+            <select id="orders-filter">
               <option value="ALL">Todos</option>
               <option value="PENDIENTE">Pendiente</option>
               <option value="PAGADO">Pagado</option>
@@ -235,6 +222,7 @@
           </div>
           <div id="orders-list" class="list" role="list"></div>
         </section>
+
         <section class="admin-panel" aria-labelledby="usuarios-title">
           <h3 id="usuarios-title">👥 Usuarios</h3>
           <div id="users-list" class="list" role="list"></div>
@@ -245,7 +233,7 @@
           <div class="codes-actions">
             <div class="upload">
               <label for="codes-file" class="sr-only">Importar CSV</label>
-              <input type="file" id="codes-file" accept=".csv" data-action="codes-import" />
+              <input type="file" id="codes-file" accept=".csv" />
               <button class="btn" data-action="codes-download-template"><i class="bi bi-filetype-csv"></i> Plantilla CSV</button>
             </div>
             <div class="assign-manual">
@@ -262,11 +250,13 @@
     </div>
   </div>
 
+  <!-- Mis pedidos -->
   <div class="modal" id="orders-modal" role="dialog" aria-modal="true" aria-labelledby="orders-title">
     <div class="modal-content">
       <button class="close" data-close aria-label="Cerrar">×</button>
       <h2 id="orders-title">🧾 Mis pedidos</h2>
       <div id="my-orders" class="list" role="list"></div>
+
       <template id="order-row-tpl">
         <article class="order-row" role="listitem">
           <header>
@@ -277,6 +267,7 @@
           <div class="items" data-fn="order-items"></div>
         </article>
       </template>
+
       <template id="order-item-tpl">
         <div class="order-item">
           <div class="info">
@@ -294,35 +285,32 @@
     </div>
   </div>
 
+  <!-- Ficha de producto -->
+  <div class="modal" id="product-modal" role="dialog" aria-modal="true" aria-labelledby="product-title">
+    <div class="modal-content">
+      <button class="close" data-close aria-label="Cerrar">×</button>
+      <div class="product-detail">
+        <img id="product-logo" alt="" style="max-height:72px;object-fit:contain;">
+        <h3 id="product-title">Producto</h3>
+        <div class="small" id="product-brand"></div>
+        <p id="product-desc" class="small"></p>
+        <label for="product-amount">Selecciona un monto:</label>
+        <select id="product-amount"></select>
+        <div class="btn-row">
+          <button class="btn" id="product-add">Agregar al carrito</button>
+          <button class="btn primary" id="product-buy">Comprar ahora</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <noscript><div class="noscript">Para usar Tati Shop necesitas habilitar JavaScript.</div></noscript>
 
   <script src="js/main.js" defer></script>
   <script>
-  if ('serviceWorker' in navigator) {
-    addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(console.error));
-  }
-
-  document.addEventListener('click', (e) => {
-    const openT = e.target.closest('[data-open]');
-    if (openT){
-      e.preventDefault();
-      abrirModal(openT.getAttribute('data-open'));
+    if ('serviceWorker' in navigator) {
+      addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(console.error));
     }
-    if (e.target.matches('[data-close]')){
-      cerrarModal(e.target.closest('.modal'));
-    }
-  });
-
-  function abrirModal(name){
-    const id = name+"-modal";
-    const el = document.getElementById(id);
-    if (el){ el.classList.add('open'); el.querySelector('.close')?.focus(); }
-    if (name==='orders'){ window.app?.cargarMisPedidos?.(); }
-    if (name==='admin'){ window.app?.cargarAdmin?.(); }
-  }
-  function cerrarModal(node){ node?.classList.remove('open'); }
-
-  window.ui = { abrirModal, cerrarModal };
   </script>
 </body>
 </html>
