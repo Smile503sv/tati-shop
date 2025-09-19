@@ -1,150 +1,151 @@
-(()=>{
+(() => {
+  "use strict";
 
-  // ======= CONFIG =======
   const IVA = 0.07;
-  const WSP_NUM = '50379553318';
-  const SOPORTE_MAIL = 'ventas-online@tati-shop.com';
-  const ADMIN_EMAILS = ['ventas-online@tati-shop.com']; // agrega más si deseas
-  const ADMIN_PIN = '8642';
+  const WSP_NUM = "50379553318";
+  const SOPORTE_MAIL = "ventas-online@tati-shop.com";
+  const ADMIN_EMAIL = SOPORTE_MAIL;
+  const ADMIN_PIN = "8642";
 
-  // ======= STORAGE KEYS =======
-  const LS_USERS  = 'tati_users';
-  const LS_ORDERS = 'tati_orders';
-  const LS_SESS   = 'tati_session';
-  const LS_CART   = 'tati_cart';
-  const LS_CODES  = 'tati_codes'; // pool de códigos digitales
+  const LS_USERS  = "tati_users";
+  const LS_ORDERS = "tati_orders";
+  const LS_SESS   = "tati_session";
+  const LS_CART   = "tati_cart";
+  const LS_CODES  = "tati_codes";
 
-  // ======= HELPERS =======
-  const money = n => `$${Number(n||0).toFixed(2)}`;
-  const nowISO = () => new Date().toISOString();
-  const safeId = () => `PED-${Date.now()}-${Math.random().toString(36).slice(2,7).toUpperCase()}`;
-  const normEmail = e => (e||'').trim().toLowerCase();
-  const byId = id => document.getElementById(id);
-  const $ = s => document.querySelector(s);
-  const $$ = s => document.querySelectorAll(s);
-  const escapeHtml = (str='') => str.replace(/[&<>"'`=\/]/g, s => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#x2F;','`':'&#x60;','=':'&#x3D;'
-  }[s]));
+  const money   = n => `$${Number(n || 0).toFixed(2)}`;
+  const nowISO  = () => new Date().toISOString();
+  const safeId  = () => `PED-${Date.now()}-${Math.random().toString(36).slice(2,7).toUpperCase()}`;
+  const normEmail = e => (e || "").trim().toLowerCase();
 
-  const LS = {
-    get:(k,fb)=>{ try{ return JSON.parse(localStorage.getItem(k)) ?? fb; } catch { return fb; } },
-    set:(k,v)=>localStorage.setItem(k, JSON.stringify(v)),
-    del:(k)=>localStorage.removeItem(k)
-  };
-  const getUsers=()=>LS.get(LS_USERS,[]), setUsers=v=>LS.set(LS_USERS,v);
-  const getOrders=()=>LS.get(LS_ORDERS,[]), setOrders=v=>LS.set(LS_ORDERS,v);
-  const getSess=()=>LS.get(LS_SESS,null), setSess=v=>LS.set(LS_SESS,v), clearSess=()=>LS.del(LS_SESS);
-  const getCart=()=>LS.get(LS_CART,[]), setCart=v=>LS.set(LS_CART,v);
-  const getCodes=()=>LS.get(LS_CODES,[]), setCodes=v=>LS.set(LS_CODES,v);
-
-  // ======= DATA =======
   const giftcards = [
-    {id:'amazon', nombre:'Amazon', brand:'Amazon', montos:[10,25,50,100], logo:'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg'},
-    {id:'google', nombre:'Google Play', brand:'Google Play', montos:[10,15,25,50,100], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Google-Play.webp'},
-    {id:'psn', nombre:'PlayStation', brand:'Sony', montos:[10,20,50,100], logo:'https://upload.wikimedia.org/wikipedia/commons/0/00/PlayStation_logo.svg'},
-    {id:'xbox', nombre:'Xbox', brand:'Microsoft', montos:[15,25,50,100], logo:'https://upload.wikimedia.org/wikipedia/commons/e/e5/Xbox_Logo.svg'},
-    {id:'steam', nombre:'Steam', brand:'Valve', montos:[5,10,25,50,100], logo:'https://upload.wikimedia.org/wikipedia/commons/a/ae/Steam_logo.svg'},
-    {id:'apple', nombre:'Apple', brand:'Apple', montos:[10,25,50,100], logo:'https://upload.wikimedia.org/wikipedia/commons/8/8a/Apple_Logo.svg'},
-    {id:'spotify', nombre:'Spotify', brand:'Spotify', montos:[10,15,30], logo:'https://upload.wikimedia.org/wikipedia/commons/2/26/Spotify_logo_with_text.svg'},
-    {id:'netflix', nombre:'Netflix', brand:'Netflix', montos:[15,30,50], logo:'https://upload.wikimedia.org/wikipedia/commons/6/69/Netflix_logo.svg'},
-    {id:'disney', nombre:'Disney+', brand:'Disney', montos:[25,50], logo:'https://upload.wikimedia.org/wikipedia/commons/3/3e/Disney%2B_logo.svg'},
-    {id:'uber', nombre:'Uber', brand:'Uber', montos:[25,50,100], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Uber.png'},
-    {id:'airbnb', nombre:'Airbnb', brand:'Airbnb', montos:[25,50,100], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Airbnb.png'},
-    {id:'starbucks', nombre:'Starbucks', brand:'Starbucks', montos:[10,20,50], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Starbucks.webp'},
-    {id:'tiktok', nombre:'TikTok', brand:'TikTok', montos:[10,20], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/TikTok.png'},
-    {id:'epicgames', nombre:'Epic Games', brand:'Epic Games', montos:[30,60], logo:'https://static-assets-prod.epicgames.com/fgc-portal/static/_next/media/assets/Fortnite_Gift_Card_Art.png'},
-    {id:'nike', nombre:'Nike', brand:'Nike', montos:[25,50,100], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Nike.png'},
-    {id:'adidas', nombre:'Adidas', brand:'Adidas', montos:[25,50], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/adidas.png'},
-    {id:'sephora', nombre:'Sephora', brand:'Sephora', montos:[25,50,75], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Sephora.png'},
-    {id:'walmart', nombre:'Walmart', brand:'Walmart', montos:[20,40,100], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Walmart.png'},
-    {id:'target', nombre:'Target', brand:'Target', montos:[20,50], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Target.webp'},
-    {id:'bestbuy', nombre:'Best Buy', brand:'Best Buy', montos:[25,50], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Best-Buy.webp'},
-    {id:'hbo', nombre:'HBO Max', brand:'Warner', montos:[30,50], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/HBO.png'},
-    {id:'homeDepot', nombre:'Home Depot', brand:'Home Depot', montos:[50,100], logo:'https://images.thdstatic.com/giftcards/catalog/53L1QLAXWKVF06WJ8DLHBYT6S8/xxlarge/RH6VN7060A1LR3FWD0WJKNVBV8_0608202315:36:58.PNG'},
-    {id:'lowes', nombre:"Lowe's", brand:"Lowe's", montos:[25,50], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Lowes.png'},
-    {id:'rolex', nombre:'Rolex', brand:'Rolex', montos:[250], logo:'https://media.rolex.com/image/upload/q_auto:eco/f_auto/c_limit,w_1920/v1724322589/rolexcom/rolex-retailers/rolex-certified-pre-owned-watches/2024-updates/rcpo-rolex-certified-pre-owned-watches-elmt_2403ac_007'},
-    {id:'discord', nombre:'Discord Nitro', brand:'Discord', montos:[10,15], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Discord.png'},
-    {id:'facebook', nombre:'Facebook Ads', brand:'Meta', montos:[25], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Facebook-Ads-by-Rewarble.png'},
-    {id:'roblox', nombre:'Roblox', brand:'Roblox', montos:[10,25], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Roblox.png'},
-    {id:'visa', nombre:'Visa Prepaid', brand:'Visa', montos:[25,50,100], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/My-Prepaid-Center-VISA.png'},
-    {id:'mastercard', nombre:'MasterCard Prepaid', brand:'Mastercard', montos:[25,50,100], logo:'https://cdn.coinsbee.com/version2/dist/assets/img/brands/Mastercard-by-Rewarble.png'}
+    { id:"amazon", nombre:"Amazon", montos:[10,25,50,100], logo:"https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" },
+    { id:"google", nombre:"Google Play", montos:[10,15,25,50,100], logo:"https://cdn.coinsbee.com/version2/dist/assets/img/brands/Google-Play.webp" },
+    { id:"psn", nombre:"PlayStation", montos:[10,20,50,100], logo:"https://upload.wikimedia.org/wikipedia/commons/0/00/PlayStation_logo.svg" },
+    { id:"xbox", nombre:"Xbox", montos:[15,25,50,100], logo:"https://upload.wikimedia.org/wikipedia/commons/e/e5/Xbox_Logo.svg" },
+    { id:"steam", nombre:"Steam", montos:[5,10,25,50,100], logo:"https://upload.wikimedia.org/wikipedia/commons/a/ae/Steam_logo.svg" },
+    { id:"apple", nombre:"Apple", montos:[10,25,50,100], logo:"https://upload.wikimedia.org/wikipedia/commons/8/8a/Apple_Logo.svg" },
+    { id:"spotify", nombre:"Spotify", montos:[10,15,30], logo:"https://upload.wikimedia.org/wikipedia/commons/2/26/Spotify_logo_with_text.svg" },
+    { id:"netflix", nombre:"Netflix", montos:[15,30,50], logo:"https://upload.wikimedia.org/wikipedia/commons/6/69/Netflix_logo.svg" },
+    { id:"disney", nombre:"Disney+", montos:[25,50], logo:"https://upload.wikimedia.org/wikipedia/commons/3/3e/Disney%2B_logo.svg" },
+    { id:"uber", nombre:"Uber", montos:[25,50,100], logo:"https://cdn.coinsbee.com/version2/dist/assets/img/brands/Uber.png" },
+    { id:"airbnb", nombre:"Airbnb", montos:[25,50,100], logo:"https://cdn.coinsbee.com/version2/dist/assets/img/brands/Airbnb.png" },
+    { id:"starbucks", nombre:"Starbucks", montos:[10,20,50], logo:"https://cdn.coinsbee.com/version2/dist/assets/img/brands/Starbucks.webp" },
+    { id:"tiktok", nombre:"TikTok", montos:[10,20], logo:"https://cdn.coinsbee.com/version2/dist/assets/img/brands/TikTok.png" },
+    { id:"epicgames", nombre:"Epic Games", montos:[30,60], logo:"https://static-assets-prod.epicgames.com/fgc-portal/static/_next/media/assets/Fortnite_Gift_Card_Art.png" },
+    { id:"nike", nombre:"Nike", montos:[25,50,100], logo:"https://cdn.coinsbee.com/version2/dist/assets/img/brands/Nike.png" },
+    { id:"adidas", nombre:"Adidas", montos:[25,50], logo:"https://cdn.coinsbee.com/version2/dist/assets/img/brands/adidas.png" },
+    { id:"sephora", nombre:"Sephora", montos:[25,50,75], logo:"https://cdn.coinsbee.com/version2/dist/assets/img/brands/Sephora.png" },
+    { id:"walmart", nombre:"Walmart", montos:[20,40,100], logo:"https://cdn.coinsbee.com/version2/dist/assets/img/brands/Walmart.png" },
+    { id:"target", nombre:"Target", montos:[20,50], logo:"https://cdn.coinsbee.com/version2/dist/assets/img/brands/Target.webp" },
+    { id:"bestbuy", nombre:"Best Buy", montos:[25,50], logo:"https://cdn.coinsbee.com/version2/dist/assets/img/brands/Best-Buy.webp" },
+    { id:"hbo", nombre:"HBO Max", montos:[30,50], logo:"https://cdn.coinsbee.com/version2/dist/assets/img/brands/HBO.png" },
+    { id:"homeDepot", nombre:"Home Depot", montos:[50,100], logo:"https://images.thdstatic.com/giftcards/catalog/53L1QLAXWKVF06WJ8DLHBYT6S8/xxlarge/RH6VN7060A1LR3FWD0WJKNVBV8_0608202315:36:58.PNG" },
+    { id:"lowes", nombre:"Lowe's", montos:[25,50], logo:"https://cdn.coinsbee.com/version2/dist/assets/img/brands/Lowes.png" },
+    { id:"rolex", nombre:"Rolex", montos:[250], logo:"https://media.rolex.com/image/upload/q_auto:eco/f_auto/c_limit,w_1920/v1724322589/rolexcom/rolex-retailers/rolex-certified-pre-owned-watches/2024-updates/rcpo-rolex-certified-pre-owned-watches-elmt_2403ac_007" },
+    { id:"discord", nombre:"Discord Nitro", montos:[10,15], logo:"https://cdn.coinsbee.com/version2/dist/assets/img/brands/Discord.png" },
+    { id:"facebook", nombre:"Facebook", montos:[25], logo:"https://cdn.coinsbee.com/version2/dist/assets/img/brands/Facebook-Ads-by-Rewarble.png" },
+    { id:"roblox", nombre:"Roblox", montos:[10,25], logo:"https://cdn.coinsbee.com/version2/dist/assets/img/brands/Roblox.png" },
+    { id:"visa", nombre:"Visa Prepaid", montos:[25,50,100], logo:"https://cdn.coinsbee.com/version2/dist/assets/img/brands/My-Prepaid-Center-VISA.png" },
+    { id:"mastercard", nombre:"MasterCard Prepaid", montos:[25,50,100], logo:"https://cdn.coinsbee.com/version2/dist/assets/img/brands/Mastercard-by-Rewarble.png" }
   ];
 
   const descripciones = {
     amazon:"Compra millones de productos en Amazon desde cualquier lugar.",
-    google:"Apps, juegos, películas y más en Google Play.",
     psn:"Juega online y compra juegos en PlayStation Store.",
+    google:"Apps, juegos, películas y más en Google Play.",
     xbox:"Suscripciones y juegos digitales para tu Xbox.",
-    steam:"Recarga tu biblioteca de PC en segundos.",
-    apple:"Compra apps, juegos, iCloud y más en App Store.",
-    spotify:"Música sin anuncios y descargas offline.",
+    spotify:"Escucha música sin anuncios con Spotify Premium.",
     netflix:"Series y películas en streaming cuando quieras.",
     disney:"Disney, Pixar, Marvel y Star Wars en una sola app.",
-    uber:"Paga viajes o Uber Eats al instante.",
-    airbnb:"Alojamientos y experiencias en todo el mundo.",
-    starbucks:"Café, bebidas y comida en tus tiendas favoritas.",
-    tiktok:"Recarga para regalos y funciones premium.",
-    epicgames:"V-Bucks y compras en Fortnite/Epic.",
-    nike:"Ropa y calzado deportivo.",
-    adidas:"Rendimiento y estilo para entrenar.",
-    sephora:"Maquillaje y skincare de las mejores marcas.",
-    walmart:"Todo para el hogar en un solo lugar.",
-    target:"Moda y hogar a excelentes precios.",
-    bestbuy:"Tecnología, gaming y electrodomésticos.",
-    hbo:"Series y cine premium en HBO Max.",
-    homeDepot:"Materiales y herramientas para tu proyecto.",
-    lowes:"Mejora tu casa con facilidad.",
-    rolex:"Certificados de servicio y accesorios (simbólico).",
-    discord:"Nitro, emojis y mejoras del servidor.",
-    facebook:"Créditos para campañas publicitarias.",
-    roblox:"Robux para experiencias y accesorios.",
-    visa:"Tarjeta prepago para usar en miles de sitios.",
-    mastercard:"Prepago aceptado globalmente."
+    steam:"Tu biblioteca de videojuegos para PC en Steam.",
+    apple:"Tarjetas para App Store, iCloud y suscripciones de Apple.",
   };
 
   const brandBg = {
-    amazon:['#232F3E','#FF9900'],
-    psn:['#003791','#0a5bd7'],
-    google:['#4285F4','#34A853'],
-    xbox:['#107C10','#0B6B0B'],
-    spotify:['#1DB954','#0F0F0F'],
-    netflix:['#E50914','#0B0B0B'],
-    disney:['#113CCF','#3BA0FF'],
-    steam:['#151A21','#2A475E']
+    amazon:["#232F3E","#FF9900"], psn:["#003791","#0a5bd7"],
+    google:["#4285F4","#34A853"], xbox:["#107C10","#0B6B0B"],
+    spotify:["#1DB954","#0F0F0F"], netflix:["#E50914","#0B0B0B"],
+    disney:["#113CCF","#3BA0FF"], steam:["#151A21","#2A475E"]
   };
 
-  // ======= MODALES =======
-  let lastFocus = null;
-  function modal(el, open){
-    const m = typeof el==='string'?byId(el):el;
-    if(!m) return;
-    if(open){
-      lastFocus = document.activeElement;
-      m.classList.add('open');
-      (m.querySelector('[data-close], button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')||m).focus?.();
-      document.documentElement.style.overflow = 'hidden';
-    }else{
-      m.classList.remove('open');
-      document.documentElement.style.overflow = '';
-      lastFocus?.focus?.();
-    }
+  const LS = {
+    get:(k,fb)=>{ try{ return JSON.parse(localStorage.getItem(k)) ?? fb; }catch{ return fb; } },
+    set:(k,v)=> localStorage.setItem(k, JSON.stringify(v)),
+    del:(k)=> localStorage.removeItem(k),
+  };
+
+  const getUsers  = ()=> LS.get(LS_USERS, []);
+  const setUsers  = v => LS.set(LS_USERS, v);
+  const getOrders = ()=> LS.get(LS_ORDERS, []);
+  const setOrders = v => LS.set(LS_ORDERS, v);
+  const getSess   = ()=> LS.get(LS_SESS, null);
+  const setSess   = v => LS.set(LS_SESS, v);
+  const clearSess = ()=> LS.del(LS_SESS);
+  const getCart   = ()=> LS.get(LS_CART, []);
+  const setCart   = v => LS.set(LS_CART, v);
+  const getCodes  = ()=> LS.get(LS_CODES, []);
+  const setCodes  = v => LS.set(LS_CODES, v);
+
+  const $  = s => document.querySelector(s);
+  const $$ = s => document.querySelectorAll(s);
+  const escapeHtml = (str="") =>
+    str.replace(/[&<>"'`=\/]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#x2F;','`':'&#x60;','=':'&#x3D;'}[s]));
+
+
+  function modalIdFromName(name){
+    if(name === "contact") return "contacto-modal";
+    if(name === "cart")    return "carrito-modal";
+    if(name === "auth")    return "auth-modal";
+    if(name === "admin")   return "admin-modal";
+    if(name === "orders")  return "orders-modal";
+    return `${name}-modal`;
   }
-  function openModal(id){ modal(id,true); }
-  function closeModal(id){ modal(id,false); }
 
-  // Esc cierra
-  addEventListener('keydown', e=>{
-    if(e.key==='Escape'){
-      ['carrito-modal','contacto-modal','auth-modal','admin-modal','orders-modal','product-modal'].forEach(id=>modal(id,false));
+  function abrirModal(name){
+    const id = modalIdFromName(name);
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.classList.add("open");
+    el.querySelector(".close")?.focus();
+    if (name === "orders") cargarMisPedidos();
+    if (name === "admin")  cargarAdmin();
+  }
+  function cerrarModal(node){
+    (node || document.querySelector(".modal.open"))?.classList.remove("open");
+  }
+
+  document.addEventListener("click", (e)=>{
+    const openT = e.target.closest("[data-open]");
+    if(openT){
+      e.preventDefault();
+      abrirModal(openT.getAttribute("data-open"));
+    }
+    if(e.target.matches("[data-close]")){
+      e.preventDefault();
+      cerrarModal(e.target.closest(".modal"));
+    }
+    const m = e.target.closest(".modal");
+    if(m && e.target === m){ cerrarModal(m); }
+  });
+
+  document.addEventListener("keydown", (e)=>{
+    if(e.key === "Escape"){
+      document.querySelectorAll(".modal.open").forEach(m=>m.classList.remove("open"));
     }
   });
-  // Clic en fondo cierra
-  addEventListener('click', e=>{
-    const m = e.target.classList?.contains('modal') ? e.target : null;
-    if(m) modal(m,false);
-  });
 
-  // ======= CARRITO =======
+  function initHeaderScroll(){
+    const top = document.querySelector(".top-bar");
+    const set = () => {
+      if(!top) return;
+      if(window.scrollY > 10) top.classList.add("is-scrolled");
+      else top.classList.remove("is-scrolled");
+    };
+    set();
+    window.addEventListener("scroll", set, { passive:true });
+  }
+
   function agruparCarrito(items){
     const m = new Map();
     items.forEach(it=>{
@@ -157,35 +158,34 @@
 
   function renderCart(){
     const cart = getCart();
-    const cc = byId('cart-count'); if(cc) cc.textContent = cart.length;
+    $("#cart-count").textContent = cart.length;
 
-    const wrap = byId('cart-items');
-    const totales = byId('totales');
-    if(!wrap || !totales) return;
+    const cartWrap = $("#cart-items");
+    const totales = $("#totales");
 
     if(!cart.length){
-      wrap.innerHTML = '<p>Tu carrito está vacío.</p>';
-      totales.innerHTML = '';
+      if(cartWrap) cartWrap.innerHTML = "<p>Tu carrito está vacío.</p>";
+      if(totales)  totales.innerHTML = "";
       return;
     }
-    const items = agruparCarrito(cart);
-    let sub=0;
-    wrap.innerHTML = items.map(it=>{
-      const l=it.precio*it.cantidad; sub+=l;
-      return `<p>${escapeHtml(it.nombre)} — ${it.cantidad} × ${money(it.precio)} = <strong>${money(l)}</strong></p>`;
-    }).join('');
-    const iva=sub*IVA, total=sub+iva;
-    totales.innerHTML = `
-      <p><strong>Subtotal:</strong> ${money(sub)}</p>
-      <p><strong>IVA (${(IVA*100).toFixed(0)}%):</strong> ${money(iva)}</p>
-      <p><strong>Total a pagar:</strong> ${money(total)}</p>`;
-  }
 
-  function agregarAlCarrito(id,nombre,monto){
-    const cart = getCart(); cart.push({id, nombre, precio:Number(monto)});
-    setCart(cart); renderCart();
-    const cc = byId('cart-count');
-    if(cc){ cc.classList.remove('bump'); void cc.offsetWidth; cc.classList.add('bump'); }
+    const items = agruparCarrito(cart);
+    let sub = 0;
+    if(cartWrap){
+      cartWrap.innerHTML = items.map(it=>{
+        const l = it.precio * it.cantidad; sub += l;
+        return `<p>${escapeHtml(it.nombre)} — ${it.cantidad} × ${money(it.precio)} = <strong>${money(l)}</strong></p>`;
+      }).join("");
+    }
+    const iva = sub * IVA;
+    const total = sub + iva;
+    if(totales){
+      totales.innerHTML = `
+        <p><strong>Subtotal:</strong> ${money(sub)}</p>
+        <p><strong>IVA (${(IVA*100).toFixed(0)}%):</strong> ${money(iva)}</p>
+        <p><strong>Total a pagar:</strong> ${money(total)}</p>
+      `;
+    }
   }
 
   function buildOrderSummary(){
@@ -195,7 +195,7 @@
       const l=it.precio*it.cantidad; sub+=l;
       return `• ${it.nombre} — ${it.cantidad} × ${money(it.precio)} = ${money(l)}`;
     });
-    const iva=sub*IVA, total=sub+iva;
+    const iva=sub*IVA,total=sub+iva;
     return {lines, sub, iva, total, items};
   }
 
@@ -204,55 +204,59 @@
     const sess = getSess();
     const order = {
       id: safeId(),
-      userEmail: sess?.email || 'invitado',
-      items, subtotal: sub, iva, total,
-      estado: 'PENDIENTE',
+      userEmail: sess?.email || "invitado",
+      items: items.map((it, idx)=>({ ...it, sku:`${it.id}-${Date.now()}-${idx}` })),
+      subtotal: sub, iva, total,
+      estado:"PENDIENTE",
       metodo: meta.metodo,
       banco: meta.banco || null,
-      nota: meta.nota || '',
-      creadoEn: nowISO(),
-      asignaciones: {} // sku -> [codes]
+      nota: meta.nota || "",
+      creadoEn: nowISO()
     };
     const orders = getOrders(); orders.unshift(order); setOrders(orders);
     return order;
   }
 
   function pagarWhatsAppFlow(nota){
-    const o = crearPedido({metodo:'whatsapp', nota});
-    const { lines, sub, iva, total } = buildOrderSummary();
-    let msg = `*Pedido Tati Shop – Gift Cards*\nID: *${o.id}*\n\n*Artículos:*\n${lines.join('\n')}\n\n*Subtotal:* ${money(sub)}\n*IVA (7%):* ${money(iva)}\n*Total:* ${money(total)}`;
+    const o = crearPedido({metodo:"whatsapp", nota});
+    const {lines, sub, iva, total} = buildOrderSummary();
+    let msg = `*Pedido Tati Shop – Gift Cards*\nID: *${o.id}*\n\n*Artículos:*\n${lines.join("\n")}\n\n*Subtotal:* ${money(sub)}\n*IVA (7%):* ${money(iva)}\n*Total:* ${money(total)}`;
     if(nota) msg += `\n\n*Nota del comprador:* ${nota}`;
     msg += `\n\nSoporte: ${SOPORTE_MAIL}`;
-    window.open(`https://wa.me/${WSP_NUM}?text=${encodeURIComponent(msg)}`,'_blank');
+    window.open(`https://wa.me/${WSP_NUM}?text=${encodeURIComponent(msg)}`,"_blank");
     setCart([]); renderCart();
   }
+
   function pagarTransferFlow(nota){
-    const bancoSel = byId('transfer-bank');
-    const banco = bancoSel ? bancoSel.value : 'Cuscatlán';
-    crearPedido({metodo:'transfer', banco, nota});
+    const bancoSel = document.getElementById("transfer-bank");
+    const banco = bancoSel ? bancoSel.value : "Cuscatlán";
+    crearPedido({metodo:"transfer", banco, nota});
     alert(`Pedido creado. Banco: ${banco}. Envía tu comprobante por WhatsApp para verificarlo.`);
     setCart([]); renderCart();
   }
+
   function procesarPago(){
-    if(getCart().length===0){ alert('Tu carrito está vacío.'); return; }
-    const metodo = [...document.querySelectorAll('input[name="paymethod"]')].find(r=>r.checked)?.value || 'whatsapp';
-    const nota = (byId('buyer-note')?.value || '').trim();
-    if(metodo==='transfer') pagarTransferFlow(nota); else pagarWhatsAppFlow(nota);
-  }
-  function updateTransferVisibility(){
-    const method = [...document.querySelectorAll('input[name="paymethod"]')].find(r=>r.checked)?.value;
-    const panel = byId('transfer-form');
-    const radioTransfer = document.querySelector('input[name="paymethod"][value="transfer"]');
-    const show = method === 'transfer';
-    if(panel){ panel.hidden = !show; panel.style.display = show ? 'block' : 'none'; }
-    if(radioTransfer) radioTransfer.setAttribute('aria-expanded', show ? 'true' : 'false');
+    if(getCart().length===0){ alert("Tu carrito está vacío."); return; }
+    const metodo = [...document.querySelectorAll('input[name="paymethod"]')].find(r=>r.checked)?.value || "whatsapp";
+    const nota = (document.getElementById("buyer-note")?.value || "").trim();
+    if(metodo==="transfer") pagarTransferFlow(nota); else pagarWhatsAppFlow(nota);
   }
 
-  addEventListener('change', e=>{
-    if(e.target.name==='paymethod') updateTransferVisibility();
-    if(e.target.id==='transfer-bank'){
-      const bank = e.target.value, list = byId('bank-data'); if(!list) return;
-      list.innerHTML = bank==='Cuscatlán'
+  function updateTransferVisibility(){
+    const method = [...document.querySelectorAll('input[name="paymethod"]')].find(r=>r.checked)?.value;
+    const panel = document.getElementById("transfer-form");
+    const radioTransfer = document.querySelector('input[name="paymethod"][value="transfer"]');
+    const show = method === "transfer";
+    if(panel){ panel.hidden = !show; panel.style.display = show ? "block" : "none"; }
+    if(radioTransfer) radioTransfer.setAttribute("aria-expanded", show ? "true" : "false");
+  }
+  document.addEventListener("change",e=>{
+    if(e.target.name==="paymethod") updateTransferVisibility();
+  });
+  document.addEventListener("change",e=>{
+    if(e.target.id==="transfer-bank"){
+      const bank = e.target.value, list = document.getElementById("bank-data"); if(!list) return;
+      list.innerHTML = bank==="Cuscatlán"
         ? `<li><strong>Beneficiario:</strong> Margarita Castro</li>
            <li><strong>Banco:</strong> Banco Cuscatlán</li>
            <li><strong>Cuenta:</strong> 401495002273779 (Ahorros)</li>`
@@ -260,472 +264,443 @@
            <li><strong>Banco:</strong> Banco Agrícola</li>
            <li><strong>Cuenta:</strong> 3710993183 (Ahorros)</li>`;
     }
-    if(e.target.id==='orders-filter'){ renderPedidos(); }
-    if(e.target.id==='codes-file' && e.target.files?.[0]) importarCSV(e.target.files[0]);
   });
 
-  // ======= CONTACTO =======
   function enviarWhatsAppContacto(){
-    const t = (byId('contact-msg')?.value || '').trim() || 'Hola, necesito ayuda.';
-    window.open(`https://wa.me/${WSP_NUM}?text=${encodeURIComponent(t)}`,'_blank');
+    const t = (document.getElementById("contact-msg")?.value || "").trim() || "Hola, necesito ayuda.";
+    window.open(`https://wa.me/${WSP_NUM}?text=${encodeURIComponent(t)}`,"_blank");
   }
 
-  // ======= AUTH =======
   async function hash(t){
     try{
       const enc = new TextEncoder().encode(t);
-      const buf = await crypto.subtle.digest('SHA-256', enc);
-      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+      const buf = await crypto.subtle.digest("SHA-256", enc);
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
     }catch{
       let h=0; for(let i=0;i<t.length;i++){ h=(h<<5)-h+t.charCodeAt(i); h|=0; } return String(h);
     }
   }
   function mostrarLogin(){
-    $('#tab-login')?.classList.add('active'); $('#tab-register')?.classList.remove('active');
-    byId('login-form')?.style && (byId('login-form').style.display='grid');
-    byId('register-form')?.style && (byId('register-form').style.display='none');
-    $('#tab-login')?.setAttribute('aria-selected','true'); $('#tab-register')?.setAttribute('aria-selected','false');
+    $("#tab-login").classList.add("active"); $("#tab-register").classList.remove("active");
+    $("#login-form").style.display="grid"; $("#register-form").style.display="none";
+    $("#tab-login").setAttribute("aria-selected","true"); $("#tab-register").setAttribute("aria-selected","false");
   }
   function mostrarRegistro(){
-    $('#tab-register')?.classList.add('active'); $('#tab-login')?.classList.remove('active');
-    byId('register-form')?.style && (byId('register-form').style.display='grid');
-    byId('login-form')?.style && (byId('login-form').style.display='none');
-    $('#tab-register')?.setAttribute('aria-selected','true'); $('#tab-login')?.setAttribute('aria-selected','false');
+    $("#tab-register").classList.add("active"); $("#tab-login").classList.remove("active");
+    $("#register-form").style.display="grid"; $("#login-form").style.display="none";
+    $("#tab-register").setAttribute("aria-selected","true"); $("#tab-login").setAttribute("aria-selected","false");
   }
   async function registrar(){
-    const name = (byId('reg-name')?.value || '').trim();
-    const email = normEmail(byId('reg-email')?.value);
-    const pass = byId('reg-pass')?.value || '';
-    if(!name || !email || !pass){ alert('Completa todos los campos'); return; }
+    const name = ($("#reg-name")?.value || "").trim();
+    const email = normEmail($("#reg-email")?.value);
+    const pass = $("#reg-pass")?.value || "";
+    if(!name || !email || !pass){ alert("Completa todos los campos"); return; }
     const users = getUsers();
-    if(users.some(u=>u.email===email)){ alert('Ese email ya está registrado'); return; }
+    if(users.some(u=>u.email===email)){ alert("Ese email ya está registrado"); return; }
     const passh = await hash(pass);
     users.push({ name, email, passh, createdAt: nowISO() });
     setUsers(users);
-    const isAdmin = ADMIN_EMAILS.includes(email);
-    setSess({ email, name, isAdmin });
-    actualizarUIAuth(); closeModal('auth-modal'); alert('Cuenta creada.');
+    setSess({ email, name, isAdmin: email===ADMIN_EMAIL });
+    actualizarUIAuth(); cerrarModal($("#auth-modal")); alert("Cuenta creada.");
   }
   async function login(){
-    const email = normEmail(byId('login-email')?.value);
-    const pass = byId('login-pass')?.value || '';
-    if(!email || !pass){ alert('Completa email y contraseña'); return; }
+    const email = normEmail($("#login-email")?.value);
+    const pass = $("#login-pass")?.value || "";
+    if(!email || !pass){ alert("Completa email y contraseña"); return; }
     const users = getUsers(); const u = users.find(u=>u.email===email);
-    if(!u){ alert('No existe ese usuario'); return; }
+    if(!u){ alert("No existe ese usuario"); return; }
     const passh = await hash(pass);
-    if(passh!==u.passh){ alert('Contraseña incorrecta'); return; }
-    const isAdmin = ADMIN_EMAILS.includes(email);
-    setSess({ email: u.email, name: u.name, isAdmin });
-    actualizarUIAuth(); closeModal('auth-modal'); alert('Sesión iniciada.');
+    if(passh!==u.passh){ alert("Contraseña incorrecta"); return; }
+    setSess({ email: u.email, name: u.name, isAdmin: email===ADMIN_EMAIL });
+    actualizarUIAuth(); cerrarModal($("#auth-modal")); alert("Sesión iniciada.");
   }
-  function logout(){ clearSess(); actualizarUIAuth(); alert('Sesión cerrada.'); }
+  function logout(){ clearSess(); actualizarUIAuth(); alert("Sesión cerrada."); }
   function adminAccesoRapido(){
-    const pin = prompt('PIN admin:');
-    if(pin===ADMIN_PIN){
-      const cur = getSess() || {email:'admin@local', name:'Administrador'};
-      setSess({...cur, isAdmin:true});
-      actualizarUIAuth(); closeModal('auth-modal'); abrirAdmin();
-    }else alert('PIN incorrecto');
+    const pin = prompt("PIN admin:");
+    if(pin===ADMIN_PIN){ setSess({ email: ADMIN_EMAIL, name:"Administrador", isAdmin:true }); actualizarUIAuth(); abrirModal("admin"); }
+    else alert("PIN incorrecto");
   }
   function actualizarUIAuth(){
     const sess = getSess();
-    const btn = byId('auth-btn'); const adminBtn = byId('admin-open');
-    if(sess){
-      if(btn){ btn.textContent = `👤 ${sess.name || sess.email}`; btn.setAttribute('data-open','auth'); }
-      if(adminBtn) adminBtn.style.display = sess.isAdmin ? 'inline-block' : 'none';
-      const span = byId('admin-session-email'); if(span) span.textContent = sess.email;
-    }else{
-      if(btn){ btn.textContent = '👤 Acceder'; btn.setAttribute('data-open','auth'); }
-      if(adminBtn) adminBtn.style.display = 'none';
-      const span = byId('admin-session-email'); if(span) span.textContent = '-';
+    const btn = $("#auth-btn"); const adminBtn = $("#admin-open");
+    if(btn){
+      if(sess){
+        btn.textContent = `👤 ${sess.name || sess.email}`;
+        btn.setAttribute("data-open","auth");
+        btn.onclick = ()=>{ if(confirm("¿Cerrar sesión?")) logout(); };
+      }else{
+        btn.textContent = "👤 Acceder";
+        btn.onclick = ()=> abrirModal("auth");
+      }
     }
+    if(adminBtn){ adminBtn.style.display = sess?.isAdmin ? "inline-block" : "none"; }
+    const span = $("#admin-session-email"); if(span) span.textContent = sess?.email || "-";
   }
 
-  // ======= ADMIN =======
   function renderPedidos(){
-    const list = byId('orders-list'); if(!list) return;
-    const filter = $('#orders-filter')?.value || 'ALL';
+    const list = $("#orders-list");
+    const filter = $("#orders-filter")?.value || "ALL";
     const orders = getOrders();
-    const rows = (filter==='ALL' ? orders : orders.filter(o=>o.estado===filter));
-    list.innerHTML = rows.length ? '' : '<p class="small">No hay pedidos.</p>';
+    const rows = (filter==="ALL"?orders:orders.filter(o=>o.estado===filter));
+    if(!list) return;
+    list.innerHTML = rows.length ? "" : '<p class="small">No hay pedidos.</p>';
     rows.forEach(o=>{
-      const d = document.createElement('div'); d.className = 'order';
+      const d = document.createElement("div");
+      d.className = "order";
       const fecha = new Date(o.creadoEn).toLocaleString();
       d.innerHTML = `
         <div class="row"><strong>${o.id}</strong><span class="small">${fecha}</span></div>
         <div class="small">Cliente: ${escapeHtml(o.userEmail)}</div>
-        <div class="small">Método: ${o.metodo}${o.banco?` (${escapeHtml(o.banco)})`:''}</div>
+        <div class="small">Método: ${o.metodo}${o.banco?` (${escapeHtml(o.banco)})`:""}</div>
         <div class="small">Total: ${money(o.total)}</div>
-        ${o.nota?`<div class="small"><em>Nota:</em> ${escapeHtml(o.nota)}</div>`:''}
+        ${o.nota?`<div class="small"><em>Nota:</em> ${escapeHtml(o.nota)}</div>`:""}
         <div class="row">
           <label>Estado:</label>
-          <select data-change-estado="${o.id}">
-            ${['PENDIENTE','PAGADO','ENTREGADO','CANCELADO'].map(s=>`<option value="${s}" ${o.estado===s?'selected':''}>${s}</option>`).join('')}
+          <select data-action="order-status" data-id="${o.id}">
+            ${["PENDIENTE","PAGADO","ENTREGADO","CANCELADO"].map(s=>`<option value="${s}" ${o.estado===s?"selected":""}>${s}</option>`).join("")}
           </select>
-          <button class="btn" data-send-whats="${o.id}">Enviar por WhatsApp</button>
-        </div>`;
+          <button class="btn" data-action="order-wsp" data-id="${o.id}">Enviar por WhatsApp</button>
+        </div>
+        <details>
+          <summary>Items</summary>
+          <ul class="small" style="margin:.25rem 0 0 1rem;">
+            ${o.items.map(it=>`<li>${escapeHtml(it.nombre)} — ${it.cantidad} × ${money(it.precio)} (SKU: ${escapeHtml(it.sku)})</li>`).join("")}
+          </ul>
+        </details>
+      `;
       list.appendChild(d);
     });
   }
-  addEventListener('change', e=>{
-    const id = e.target.getAttribute?.('data-change-estado');
-    if(id){ cambiarEstado(id, e.target.value); }
-  });
-  addEventListener('click', e=>{
-    const id = e.target.getAttribute?.('data-send-whats');
-    if(id){ enviarWhatsDePedido(id); }
-  });
   function cambiarEstado(id,estado){
     const orders = getOrders();
     const i = orders.findIndex(o=>o.id===id);
-    if(i>-1){
-      orders[i].estado = estado;
-      setOrders(orders);
-      if(estado==='PAGADO'){ autoAsignarCodigos(orders[i]); }
-      renderPedidos();
-    }
+    if(i>-1){ orders[i].estado=estado; setOrders(orders); renderPedidos(); }
   }
   function enviarWhatsDePedido(id){
     const o = getOrders().find(x=>x.id===id); if(!o) return;
     const lines = o.items.map(it=>`• ${it.nombre} — ${it.cantidad} × ${money(it.precio)} = ${money(it.precio*it.cantidad)}`);
-    const msg = `*Pedido Tati Shop – ${id}*\nCliente: ${o.userEmail}\n\n*Artículos:*\n${lines.join('\n')}\n\n*Subtotal:* ${money(o.subtotal)}\n*IVA:* ${money(o.iva)}\n*Total:* ${money(o.total)}\n*Estado:* ${o.estado}\n*Método:* ${o.metodo}${o.banco?` (${o.banco})`:''}`;
-    window.open(`https://wa.me/${WSP_NUM}?text=${encodeURIComponent(msg)}`,'_blank');
+    const msg = `*Pedido Tati Shop – ${id}*\nCliente: ${o.userEmail}\n\n*Artículos:*\n${lines.join("\n")}\n\n*Subtotal:* ${money(o.subtotal)}\n*IVA:* ${money(o.iva)}\n*Total:* ${money(o.total)}\n*Estado:* ${o.estado}\n*Método:* ${o.metodo}${o.banco?` (${o.banco})`:""}`;
+    window.open(`https://wa.me/${WSP_NUM}?text=${encodeURIComponent(msg)}`,"_blank");
   }
   function renderUsuarios(){
-    const list = byId('users-list'); if(!list) return;
-    const users = getUsers();
-    list.innerHTML = users.length ? '' : '<p class="small">Sin usuarios registrados.</p>';
+    const list = $("#users-list"); const users = getUsers();
+    if(!list) return;
+    list.innerHTML = users.length ? "" : '<p class="small">Sin usuarios registrados.</p>';
     users.forEach(u=>{
-      const d = document.createElement('div'); d.className='order';
+      const d = document.createElement("div"); d.className="order";
       const fecha = new Date(u.createdAt).toLocaleString();
       d.innerHTML = `
-        <div class="row"><strong>${escapeHtml(u.name || '(sin nombre)')}</strong><span class="small">${escapeHtml(u.email)}</span></div>
-        <div class="small">Registrado: ${fecha}</div>`;
+        <div class="row"><strong>${escapeHtml(u.name || "(sin nombre)")}</strong><span class="small">${escapeHtml(u.email)}</span></div>
+        <div class="small">Registrado: ${fecha}</div>
+      `;
       list.appendChild(d);
     });
   }
 
-  // ======= CÓDIGOS DIGITALES =======
-  function parseCSV(text){
-    const lines=text.split(/\r?\n/).filter(Boolean);
-    const [h,...rows]=lines;
-    const heads=h.split(',').map(s=>s.trim().toLowerCase());
-    const skuIdx=heads.indexOf('sku'), codeIdx=heads.indexOf('code');
-    if(skuIdx===-1||codeIdx===-1) throw new Error('CSV debe tener columnas sku,code');
-    return rows.map(r=>{
-      const c=r.split(',');
-      return { sku:c[skuIdx]?.trim(), code:c[codeIdx]?.trim(), status:'available' };
-    });
-  }
-  async function importarCSV(file){
-    const text = await file.text();
-    const rows = parseCSV(text);
-    const pool = getCodes();
-    rows.forEach(r=>{
-      if(r.sku && r.code && !pool.some(x=>x.code===r.code)) pool.push(r);
-    });
-    setCodes(pool);
-    alert(`Importados ${rows.length} códigos.`);
-    pintarStatsCodigos();
-  }
-  function descargarPlantillaCSV(){
-    const sample = `sku,code\napple,ABCD-EFGH-IJKL\npsn,AAAA-BBBB-CCCC\n`;
-    const blob = new Blob([sample],{type:'text/csv'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href=url; a.download='plantilla_codigos.csv'; a.click();
-    URL.revokeObjectURL(url);
-  }
-  function pintarStatsCodigos(){
-    const el = byId('codes-stats'); if(!el) return;
-    const pool = getCodes();
-    const bySku = {};
-    pool.forEach(c=>{
-      bySku[c.sku] ??= {available:0,assigned:0,invalidated:0,total:0};
-      bySku[c.sku][c.status]++; bySku[c.sku].total++;
-    });
-    el.innerHTML = Object.entries(bySku).map(([sku,st]) =>
-      `<div class="order"><strong>${sku}</strong><div class="small">Disponibles: ${st.available} · Asignados: ${st.assigned} · Invalidados: ${st.invalidated} · Total: ${st.total}</div></div>`
-    ).join('') || '<p class="small">Sin códigos importados.</p>';
-  }
-  function tomarCodigoDisponible(sku){
-    const pool = getCodes();
-    const i = pool.findIndex(c=>c.sku===sku && c.status==='available');
-    if(i>-1){ const code = pool[i]; pool[i].status='assigned'; setCodes(pool); return code.code; }
-    return null;
-  }
-  function autoAsignarCodigos(order){
-    order.items.forEach(it=>{
-      const sku = it.id;
-      const need = it.cantidad || 1;
-      order.asignaciones[sku] = order.asignaciones[sku] || [];
-      for(let k=0;k<need;k++){
-        const code = tomarCodigoDisponible(sku);
-        if(code) order.asignaciones[sku].push(code);
-      }
-    });
-    const orders = getOrders();
-    const pos = orders.findIndex(o=>o.id===order.id);
-    if(pos>-1){ orders[pos]=order; setOrders(orders); }
-  }
-  function asignarManualCodigo(){
-    const orderId = (byId('manual-order')?.value||'').trim();
-    const itemId  = (byId('manual-item')?.value||'').trim();
-    const code    = (byId('manual-code')?.value||'').trim();
-    if(!orderId||!itemId||!code){ alert('Completa pedido, item y código'); return; }
-    const orders = getOrders();
-    const idx = orders.findIndex(o=>o.id===orderId);
-    if(idx===-1){ alert('Pedido no encontrado'); return; }
-    const pool = getCodes();
-    const pidx = pool.findIndex(c=>c.code===code && c.status!=='invalidated');
-    if(pidx===-1){
-      orders[idx].asignaciones[itemId] = [...(orders[idx].asignaciones[itemId]||[]), code];
-    }else{
-      pool[pidx].status='assigned'; setCodes(pool);
-      orders[idx].asignaciones[itemId] = [...(orders[idx].asignaciones[itemId]||[]), code];
-    }
-    setOrders(orders); alert('Código asignado'); renderPedidos();
+  function renderCodesStats(){
+    const box = $("#codes-stats"); if(!box) return;
+    const codes = getCodes();
+    const libres = codes.filter(c=>!c.assignedToOrder).length;
+    const usados  = codes.filter(c=>c.usedAt).length;
+    box.innerHTML = `
+      <div class="card"><strong>Total códigos:</strong> ${codes.length}</div>
+      <div class="card"><strong>Disponibles:</strong> ${libres}</div>
+      <div class="card"><strong>Asignados/Usados:</strong> ${codes.length - libres}</div>
+      <div class="card"><strong>Marcados usados:</strong> ${usados}</div>
+    `;
   }
 
-  // ======= CATÁLOGO =======
+  function parseCSV(text){
+    const rows = text.split(/\r?\n/).map(r=>r.trim()).filter(Boolean);
+    const out = [];
+    for(const r of rows){
+      const [idItem, code] = r.split(",").map(x=>x?.trim());
+      if(idItem && code) out.push({ idItem, code });
+    }
+    return out;
+  }
+  function importCodesFromCSV(file){
+    if(!file) return;
+    const fr = new FileReader();
+    fr.onload = () => {
+      try{
+        const arr = parseCSV(String(fr.result || ""));
+        if(!arr.length){ alert("CSV vacío o sin columnas válidas (idItem,code)"); return; }
+        const codes = getCodes();
+        let add=0;
+        arr.forEach(x=>{
+          if(!codes.some(c=>c.idItem===x.idItem && c.code===x.code)){
+            codes.push({ ...x, usedAt:null, assignedToOrder:null });
+            add++;
+          }
+        });
+        setCodes(codes);
+        alert(`Importados ${add} códigos.`);
+        renderCodesStats();
+      }catch(e){ console.error(e); alert("Error leyendo CSV"); }
+    };
+    fr.readAsText(file);
+  }
+
+  function assignCodeManual(){
+    const orderId = ($("#manual-order")?.value || "").trim();
+    const itemId  = ($("#manual-item")?.value || "").trim();
+    const codeStr = ($("#manual-code")?.value || "").trim();
+    if(!orderId || !itemId || !codeStr){ alert("Completa pedido, item y código"); return; }
+    const orders = getOrders();
+    const o = orders.find(x=>x.id===orderId);
+    if(!o){ alert("No existe el pedido"); return; }
+    const it = o.items.find(i=> i.id===itemId || i.sku===itemId );
+    if(!it){ alert("No existe ese item en el pedido"); return; }
+    it.code = codeStr;
+    setOrders(orders);
+    alert("Código asignado al item.");
+    renderPedidos();
+  }
+
+  function cargarAdmin(){
+    renderPedidos();
+    renderUsuarios();
+    renderCodesStats();
+  }
+
+
   function renderGiftCards(){
-    const c = byId('giftcards-grid'); if(!c) return;
-    c.innerHTML = '';
+    const c = document.getElementById("giftcards-grid");
+    if(!c) return;
+    c.innerHTML = "";
     giftcards.forEach(gc=>{
       const selectId = `select-${gc.id}`;
-      const d = document.createElement('div');
-      d.className = 'card';
+      const d = document.createElement("div");
+      d.className = "card";
       d.innerHTML = `
-        <img src="${gc.logo}" alt="${escapeHtml(gc.nombre)}" referrerpolicy="no-referrer" crossorigin="anonymous"
+        <img src="${gc.logo}"
+             alt="${escapeHtml(gc.nombre)}"
+             referrerpolicy="no-referrer" crossorigin="anonymous"
              onerror="this.onerror=null; this.src='img/cards/default.svg'">
         <h3>${escapeHtml(gc.nombre)}</h3>
-        <p class="small">${escapeHtml(descripciones[gc.id]||'Código digital canjeable en el servicio/tienda del fabricante.')}</p>
-        <label for="${selectId}" class="sr-only">Selecciona monto</label>
-        <select id="${selectId}">${gc.montos.map(m=>`<option value="${m}">${money(m)}</option>`).join('')}</select>
-        <div class="btn-row">
-          <button class="btn" data-view="${gc.id}">Ver detalles</button>
-          <button class="btn btn-cart" data-add="${gc.id}" data-sel="${selectId}">Agregar</button>
-        </div>`;
+        <p>${escapeHtml(descripciones[gc.id] || "Selecciona un monto:")}</p>
+        <select id="${selectId}">
+          ${gc.montos.map(m=>`<option value="${m}">${money(m)}</option>`).join("")}
+        </select>
+        <div class="row">
+          <button class="buy-btn" data-add="${gc.id}" data-name="${escapeHtml(gc.nombre)}" data-select="${selectId}">Agregar al carrito</button>
+          <button class="btn btn-cart" data-buy-now="${gc.id}" data-name="${escapeHtml(gc.nombre)}" data-select="${selectId}">Comprar ya</button>
+        </div>
+      `;
       c.appendChild(d);
     });
   }
 
-  // Ficha de producto
-  function abrirFichaProducto(id){
-    const prod = giftcards.find(g=>g.id===id); if(!prod) return;
-    const logo  = byId('product-logo'),
-          title = byId('product-title'),
-          brand = byId('product-brand'),
-          desc  = byId('product-desc'),
-          amount= byId('product-amount');
-    if(logo){ logo.src=prod.logo; logo.alt=prod.nombre; }
-    if(title) title.textContent=prod.nombre;
-    if(brand) brand.textContent=prod.brand||'';
-    if(desc)  desc.textContent=descripciones[id]||'Código digital.';
-    if(amount) amount.innerHTML = prod.montos.map(m=>`<option value="${m}">${money(m)}</option>`).join('');
-    const addBtn = byId('product-add'), buyBtn = byId('product-buy');
-    if(addBtn) addBtn.onclick = ()=>{ const m=Number(byId('product-amount').value); agregarAlCarrito(prod.id, prod.nombre, m); };
-    if(buyBtn) buyBtn.onclick = ()=>{ const m=Number(byId('product-amount').value); setCart([{id:prod.id, nombre:prod.nombre, precio:m}]); renderCart(); openModal('carrito-modal'); };
-    openModal('product-modal');
+  function agregarAlCarrito(id,nombre,selectId){
+    const sel = document.getElementById(selectId);
+    const monto = Number(sel?.value || 0);
+    if(!monto || isNaN(monto)){ alert("Selecciona un monto válido"); return; }
+    const cart = getCart(); cart.push({ id, nombre, precio:monto, cantidad:1 });
+    setCart(cart); renderCart();
+
+    const cc = document.getElementById("cart-count");
+    cc?.classList.remove("bump"); void cc?.offsetWidth; cc?.classList.add("bump");
   }
 
-  // ======= MIS PEDIDOS =======
-  function renderMisPedidos(){
-    const cont = document.getElementById('my-orders');
-    if(!cont) return;
+  function comprarAhora(id,nombre,selectId){
+    agregarAlCarrito(id,nombre,selectId);
+    abrirModal("cart");
+  }
 
+  const slideshowIds = ["amazon","psn","google","xbox","spotify","netflix","disney","steam"];
+  let slideIndex=0, slideTimer=null;
+
+  function setSlideBackground(id){
+    const [c1,c2] = brandBg[id] || ["#7c5cff","#2ee6a6"];
+    const bg = document.getElementById("slide-bg");
+    if(!bg) return;
+    bg.classList.remove("show");
+    bg.style.setProperty("--c1",c1);
+    bg.style.setProperty("--c2",c2);
+    void bg.offsetWidth;
+    bg.classList.add("show");
+  }
+  function pintarSlide(index){
+    const id = slideshowIds[index];
+    const it = giftcards.find(g=>g.id===id);
+    const card = document.getElementById("slide-card");
+    const desc = descripciones[id] || "";
+    if(!it || !card) return;
+    setSlideBackground(id);
+    card.classList.remove("active");
+    card.innerHTML = `
+      <img src="${it.logo}" alt="${escapeHtml(it.nombre)}"
+           referrerpolicy="no-referrer" crossorigin="anonymous"
+           onerror="this.onerror=null; this.src='img/cards/default.svg'">
+      <h3>${escapeHtml(it.nombre)}</h3>
+      <p>${escapeHtml(desc)}</p>
+    `;
+    void card.offsetWidth;
+    card.classList.add("active");
+    document.querySelectorAll("#slide-dots button").forEach((b,i)=>b.classList.toggle("active",i===index));
+  }
+  function slideNext(){ slideIndex=(slideIndex+1)%slideshowIds.length; pintarSlide(slideIndex); }
+  function slidePrev(){ slideIndex=(slideIndex-1+slideshowIds.length)%slideshowIds.length; pintarSlide(slideIndex); }
+  function iniciarAutoSlide(){ detenerAutoSlide(); slideTimer=setInterval(slideNext,3000); }
+  function detenerAutoSlide(){ if(slideTimer) clearInterval(slideTimer); slideTimer=null; }
+  function initSlideshow(){
+    const dots = document.getElementById("slide-dots"); if(!dots) return;
+    dots.innerHTML="";
+    slideshowIds.forEach((_,i)=>{
+      const b = document.createElement("button");
+      b.setAttribute("aria-label", `Ir a la diapositiva ${i+1}`);
+      b.addEventListener("click",()=>{ slideIndex=i; pintarSlide(slideIndex); iniciarAutoSlide(); });
+      dots.appendChild(b);
+    });
+    document.getElementById("slide-next")?.addEventListener("click",()=>{ slideNext(); iniciarAutoSlide(); });
+    document.getElementById("slide-prev")?.addEventListener("click",()=>{ slidePrev(); iniciarAutoSlide(); });
+    const ss = document.getElementById("slideshow");
+    ss?.addEventListener("mouseenter",detenerAutoSlide);
+    ss?.addEventListener("mouseleave",iniciarAutoSlide);
+    pintarSlide(slideIndex); iniciarAutoSlide();
+  }
+
+  function cargarMisPedidos(){
     const sess = getSess();
-    const mine = getOrders().filter(o=>o.userEmail===(sess?.email||'invitado'));
+    const my = (sess?.email) ? getOrders().filter(o=>o.userEmail===sess.email) : [];
+    const cont = $("#my-orders");
+    const tplRow = document.getElementById("order-row-tpl");
+    const tplItem = document.getElementById("order-item-tpl");
+    if(!cont || !tplRow || !tplItem) return;
 
-    cont.innerHTML = '';
-    if(mine.length === 0){
-      cont.innerHTML = '<p class="small">Aún no tienes pedidos.</p>';
-      return;
-    }
+    cont.innerHTML = my.length ? "" : '<p class="small">Aún no tienes pedidos.</p>';
 
-    const rowTpl  = document.getElementById('order-row-tpl');
-    const itemTpl = document.getElementById('order-item-tpl');
-
-    mine.forEach(o=>{
-      const row = rowTpl.content.cloneNode(true);
-      row.querySelector('[data-fn="order-number"]').textContent = o.id;
-      row.querySelector('[data-fn="order-date"]').textContent   = new Date(o.creadoEn).toLocaleString();
-      const st = row.querySelector('[data-fn="order-status"]');
+    my.forEach(o=>{
+      const node = tplRow.content.cloneNode(true);
+      node.querySelector('[data-fn="order-number"]').textContent = o.id;
+      node.querySelector('[data-fn="order-date"]').textContent   = new Date(o.creadoEn).toLocaleString();
+      const st = node.querySelector('[data-fn="order-status"]');
       st.textContent = o.estado;
-      st.classList.add('badge', `status-${o.estado}`);
+      st.classList.add(`status-${o.estado}`);
 
-      const itemsWrap = row.querySelector('[data-fn="order-items"]');
+      const itemsWrap = node.querySelector('[data-fn="order-items"]');
 
       o.items.forEach(it=>{
-        const iNode = itemTpl.content.cloneNode(true);
-        iNode.querySelector('[data-fn="item-name"]').textContent = `${it.nombre} × ${it.cantidad}`;
-        iNode.querySelector('[data-fn="item-sku"]').textContent  = it.id;
-
-        const codes = o.asignaciones?.[it.id] || [];
-        const fulfilled = (codes.length >= (it.cantidad||1));
-        const ff = fulfilled ? 'FULFILLED' : (codes.length>0 ? 'PARCIAL' : 'PENDIENTE');
-
-        const ffBox = iNode.querySelector('[data-fn="item-ff-status"]');
-        ffBox.innerHTML = `Estado de cumplimiento: <span class="badge ${ff==='FULFILLED'?'success':ff==='PARCIAL'?'warn':'info'}">${ff}</span>`;
+        const iNode = tplItem.content.cloneNode(true);
+        iNode.querySelector('[data-fn="item-name"]').textContent = it.nombre;
+        iNode.querySelector('[data-fn="item-sku"]').textContent  = it.sku;
 
         const codeBox = iNode.querySelector('[data-fn="code-mask"]');
         const btnReveal = iNode.querySelector('[data-fn="btn-reveal"]');
         const btnCopy   = iNode.querySelector('[data-fn="btn-copy"]');
-        const puedeRevelar = (o.estado==='PAGADO' || o.estado==='ENTREGADO') && codes.length>0;
 
-        if(puedeRevelar){
-          codeBox.textContent = '•••• •••• •••• ••••';
-          codeBox.setAttribute('data-code', codes.join(' | '));
-          btnReveal.hidden = false;
-        }else{
-          codeBox.textContent = 'En proceso…';
-          btnReveal.hidden = true;
-          btnCopy.hidden = true;
-        }
+        const hasCode = Boolean(it.code);
+        const canReveal = hasCode && (o.estado === "ENTREGADO" || o.estado === "PAGADO");
+
+        codeBox.classList.toggle("masked", hasCode && !canReveal);
+        codeBox.classList.toggle("revealed", false);
+        codeBox.textContent = hasCode ? (canReveal ? it.code : "") : "Sin código asignado aún.";
+
+        btnReveal.hidden = !(hasCode && !canReveal);
+        btnCopy.hidden   = !canReveal;
+
+        iNode.querySelector('[data-action="reveal"]')?.addEventListener("click", ()=>{
+          if(o.estado === "PENDIENTE" || o.estado === "CANCELADO"){
+            alert("Tu pedido aún no está listo para revelar el código.");
+            return;
+          }
+          codeBox.classList.remove("masked");
+          codeBox.classList.add("revealed");
+          codeBox.textContent = it.code || "—";
+          btnCopy.hidden = !it.code;
+        });
+
+        iNode.querySelector('[data-action="copy"]')?.addEventListener("click", async ()=>{
+          try{
+            await navigator.clipboard.writeText(it.code || "");
+            alert("Código copiado");
+          }catch{ alert("No se pudo copiar"); }
+        });
 
         itemsWrap.appendChild(iNode);
       });
 
-      cont.appendChild(row);
+      cont.appendChild(node);
     });
   }
 
-  // ======= SLIDESHOW =======
-  function initSlideshow(){
-    const ids = ['amazon','psn','google','xbox','spotify','netflix','disney','steam'];
-    let i=0, timer=null;
-    const dots = byId('slide-dots'), card = byId('slide-card'), bgEl = byId('slide-bg');
-    const prev = byId('slide-prev'), next = byId('slide-next'), ss = byId('slideshow');
-    if(!dots||!card||!bgEl||!prev||!next||!ss) return;
 
-    dots.innerHTML='';
-    ids.forEach((_,k)=>{
-      const b=document.createElement('button');
-      b.setAttribute('aria-label',`Ir a la diapositiva ${k+1}`);
-      b.addEventListener('click',()=>{ i=k; pintar(); start(); });
-      dots.appendChild(b);
-    });
-
-    function setBg(id){
-      const [c1,c2] = brandBg[id] || ['#7c5cff','#2ee6a6'];
-      bgEl.classList.remove('show');
-      bgEl.style.setProperty('--c1',c1);
-      bgEl.style.setProperty('--c2',c2);
-      void bgEl.offsetWidth;
-      bgEl.classList.add('show');
-    }
-    function pintar(){
-      const id=ids[i]; const it=giftcards.find(g=>g.id===id); if(!it) return;
-      setBg(id);
-      card.classList.remove('active');
-      card.innerHTML = `
-        <img src="${it.logo}" alt="${escapeHtml(it.nombre)}" onerror="this.onerror=null; this.src='img/cards/default.svg'">
-        <h3>${escapeHtml(it.nombre)}</h3>
-        <p>${escapeHtml(descripciones[id]||'')}</p>`;
-      void card.offsetWidth; card.classList.add('active');
-      dots.querySelectorAll('button').forEach((b,idx)=>b.classList.toggle('active', idx===i));
-    }
-    function start(){ if(timer) clearInterval(timer); timer=setInterval(()=>{ i=(i+1)%ids.length; pintar(); }, 3000); }
-    function stop(){ if(timer) clearInterval(timer); }
-
-    next.addEventListener('click',()=>{ i=(i+1)%ids.length; pintar(); start(); });
-    prev.addEventListener('click',()=>{ i=(i-1+ids.length)%ids.length; pintar(); start(); });
-    ss.addEventListener('mouseenter', stop);
-    ss.addEventListener('mouseleave', start);
-
-    pintar(); start();
-  }
-
-  // ======= HEADER scroll =======
-  function initHeaderScroll(){
-    const bar = $('.top-bar'); if(!bar) return;
-    const onScroll = () => bar.classList.toggle('is-scrolled', window.scrollY>10);
-    onScroll(); window.addEventListener('scroll', onScroll, {passive:true});
-  }
-
-  // ======= DELEGACIÓN GLOBAL =======
-  // data-open: abrir modales
-  addEventListener('click', e=>{
-    const opener = e.target.closest?.('[data-open]');
-    if(!opener) return;
-    e.preventDefault();
-    const target = opener.getAttribute('data-open');
-    if(target==='orders'){ renderMisPedidos(); }
-    if(target==='admin'){ const s=getSess(); if(!(s?.isAdmin)) return openModal('auth-modal'); else { renderPedidos(); renderUsuarios(); pintarStatsCodigos(); } }
-    if(target==='cart'){ renderCart(); }
-    openModal(`${target}-modal`);
-  });
-
-  // data-close ya se maneja con el click en fondo y este:
-  addEventListener('click', e=>{
-    if(e.target.matches('[data-close]')){ const m=e.target.closest('.modal'); m&&modal(m,false); }
-  });
-
-  // data-action: acciones principales
-  addEventListener('click', e=>{
-    const el = e.target.closest?.('[data-action]'); if(!el) return;
-    const a = el.getAttribute('data-action');
-    if(a==='wsp-contact') enviarWhatsAppContacto();
-    else if(a==='login')  login();
-    else if(a==='register') registrar();
-    else if(a==='admin-quick') adminAccesoRapido();
-    else if(a==='logout') logout();
-    else if(a==='pagar')  procesarPago();
-    else if(a==='vaciar') { setCart([]); renderCart(); }
-    else if(a==='codes-download-template') descargarPlantillaCSV();
-    else if(a==='assign-code') asignarManualCodigo();
-    else if(a==='reveal'){ // dentro de orders
-      const actions = el.closest('.actions');
-      const box = actions.querySelector('[data-fn="code-mask"]');
-      const copyBtn = actions.querySelector('[data-fn="btn-copy"]');
-      const real = box.getAttribute('data-code') || '';
-      if(real){ box.textContent = real; copyBtn.hidden = false; }
-    }
-    else if(a==='copy'){
-      const actions = el.closest('.actions');
-      const box = actions.querySelector('[data-fn="code-mask"]');
-      navigator.clipboard.writeText(box.textContent || '');
-      el.textContent = 'Copiado ✓'; setTimeout(()=>el.textContent='Copiar',1200);
-    }
-  });
-
-  // Auth tabs
-  addEventListener('click', e=>{
-    const tabBtn = e.target.closest?.('[data-auth-tab]'); if(!tabBtn) return;
-    const which = tabBtn.getAttribute('data-auth-tab');
-    if(which==='login') mostrarLogin();
-    if(which==='register') mostrarRegistro();
-  });
-
-  // Catálogo (agregar / ver detalles)
-  addEventListener('click', e=>{
-    const add = e.target.getAttribute?.('data-add');
+  document.addEventListener("click",(e)=>{
+    const add = e.target.closest("[data-add]");
     if(add){
-      const selId = e.target.getAttribute('data-sel');
-      const sel = byId(selId);
-      const monto = Number(sel?.value || 0) || giftcards.find(g=>g.id===add)?.montos?.[0];
-      const nombre = giftcards.find(g=>g.id===add)?.nombre || add;
-      agregarAlCarrito(add, nombre, monto);
-      return;
+      const id = add.getAttribute("data-add");
+      const name = add.getAttribute("data-name");
+      const sel = add.getAttribute("data-select");
+      agregarAlCarrito(id,name,sel);
     }
-    const view = e.target.getAttribute?.('data-view');
-    if(view){ abrirFichaProducto(view); }
+    const buy = e.target.closest("[data-buy-now]");
+    if(buy){
+      const id = buy.getAttribute("data-buy-now");
+      const name = buy.getAttribute("data-name");
+      const sel = buy.getAttribute("data-select");
+      comprarAhora(id,name,sel);
+    }
+
+    const vaciar = e.target.closest('[data-action="vaciar"]');
+    if(vaciar){ setCart([]); renderCart(); }
+
+    const pagar = e.target.closest('[data-action="pagar"]');
+    if(pagar){ procesarPago(); }
+
+    const wspc = e.target.closest('[data-action="wsp-contact"]');
+    if(wspc){ enviarWhatsAppContacto(); }
+
+    const selStatus = e.target.closest('select[data-action="order-status"]');
+    if(selStatus){
+      cambiarEstado(selStatus.getAttribute("data-id"), selStatus.value);
+    }
+    const wspBtn = e.target.closest('button[data-action="order-wsp"]');
+    if(wspBtn){ enviarWhatsDePedido(wspBtn.getAttribute("data-id")); }
+
+    if(e.target.matches('[data-action="codes-download-template"]')){
+      const csv = "idItem,code\napple-123,AAAA-BBBB-CCCC\nxbox-987,XXXX-YYYY-ZZZZ\n";
+      const blob = new Blob([csv], {type:"text/csv"});
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+      a.download = "plantilla_codigos.csv"; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+    }
+    if(e.target.matches('[data-action="assign-code"]')) assignCodeManual();
   });
 
-  // ======= BACKWARD COMPAT (por si algo viejo lo llama) =======
-  window.abrirAdmin = () => { const s=getSess(); if(!(s?.isAdmin)){ openModal('auth-modal'); return; } openModal('admin-modal'); renderPedidos(); renderUsuarios(); pintarStatsCodigos(); };
+  document.addEventListener("change",(e)=>{
+    if(e.target.matches('[data-action="codes-import"]')){
+      importCodesFromCSV(e.target.files?.[0]);
+      e.target.value = "";
+    }
+    if(e.target.matches('[data-action="filter-orders"]')){
+      renderPedidos();
+    }
+  });
 
-  // ======= INIT =======
-  document.addEventListener('DOMContentLoaded', ()=>{
+  function init(){
     actualizarUIAuth();
     initHeaderScroll();
     initSlideshow();
     renderGiftCards();
     renderCart();
 
-    const bankSelect = byId('transfer-bank');
-    if(bankSelect){ bankSelect.value='Cuscatlán'; bankSelect.dispatchEvent(new Event('change')); }
+    const bankSelect = document.getElementById("transfer-bank");
+    if(bankSelect){ bankSelect.value="Cuscatlán"; bankSelect.dispatchEvent(new Event("change")); }
     updateTransferVisibility();
-  });
 
+    document.querySelector('[data-auth-tab="login"]')?.addEventListener("click", mostrarLogin);
+    document.querySelector('[data-auth-tab="register"]')?.addEventListener("click", mostrarRegistro);
+
+    document.querySelector('[data-action="login"]')?.addEventListener("click", login);
+    document.querySelector('[data-action="register"]')?.addEventListener("click", registrar);
+    document.querySelector('[data-action="logout"]')?.addEventListener("click", logout);
+    document.querySelector('[data-action="admin-quick"]')?.addEventListener("click", adminAccesoRapido);
+
+    window.app = Object.assign(window.app || {}, {
+      cargarMisPedidos,
+      cargarAdmin
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
 })();
