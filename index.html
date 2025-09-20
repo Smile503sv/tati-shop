@@ -3,43 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <title>Gift Cards | Tati Shop</title>
+  <meta name="description" content="Compra y regala gift cards digitales en Tati Shop: Google Play, Xbox, PlayStation y más. Entrega rápida por WhatsApp o correo." />
 
-  <meta name="description" content="Gift Cards digitales al instante. Compra segura en Tati Shop y recibe tu código listo para usar." />
+  <link rel="canonical" href="https://tati-shop.com/" />
   <meta property="og:title" content="Gift Cards | Tati Shop" />
-  <meta property="og:description" content="Compra y recibe códigos digitales al instante." />
+  <meta property="og:description" content="Elige, regala, sorprende — digital y al instante." />
   <meta property="og:type" content="website" />
-  <meta property="og:image" content="/img/og-cover.jpg" />
-  <meta name="theme-color" content="#27c9e6" />
+  <meta property="og:locale" content="es_SV" />
+  <meta property="og:image" content="img/og-image.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
 
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" type="image/png" sizes="32x32" href="img/icon-32.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
-  <link rel="apple-touch-icon" href="img/icon-192.png">
-
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preload" href="css/style.css" as="style">
   <link rel="stylesheet" href="css/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <link rel="icon" href="img/favicon.ico">
+  <meta name="theme-color" content="#0f1220">
 
 </head>
-<body class="theme--tati">
+<body>
   <a class="skiplink" href="#contenido">Saltar al contenido</a>
 
   <header class="main-header" role="banner">
     <div class="top-bar">
       <a href="#" class="brand" aria-label="Inicio">
-        <img src="img/logo.svg" alt="Tati Shop" width="160" height="40" loading="eager" />
+        <img src="img/logo.svg" alt="Tati Shop" class="logo-left" width="128" height="32" />
       </a>
-      <nav class="primary" aria-label="Principal">
-        <a href="#catalogo">Catálogo</a>
-        <a href="#" data-open="orders" role="button">Mis pedidos</a>
-      </nav>
+
       <div class="top-actions" role="navigation" aria-label="Acciones rápidas">
-        <button class="btn" data-open="contact"><i class="bi bi-whatsapp"></i> Contacto</button>
-        <button class="btn" id="auth-btn" data-open="auth"><i class="bi bi-person"></i> Acceder</button>
-        <button class="btn" id="admin-open" data-open="admin" style="display:none;"><i class="bi bi-tools"></i> Admin</button>
-        <button class="btn primary" data-open="cart" aria-haspopup="dialog" aria-controls="carrito-modal">
-          <i class="bi bi-gift"></i> Ver Carrito (<span id="cart-count" aria-live="polite">0</span>)
+        <button class="secundario-btn" onclick="abrirContacto()" aria-haspopup="dialog">📞 Contacto</button>
+        <button class="secundario-btn" id="auth-btn" onclick="abrirAuth()" aria-haspopup="dialog">👤 Acceder</button>
+        <button class="secundario-btn" id="admin-open" onclick="abrirAdmin()" style="display:none;" aria-haspopup="dialog">🛠️ Admin</button>
+        <button class="carrito-btn" onclick="abrirCarrito()" aria-haspopup="dialog" aria-controls="carrito-modal">
+          🛒 Ver Carrito (<span id="cart-count" aria-live="polite">0</span>)
         </button>
       </div>
     </div>
@@ -49,21 +49,25 @@
       <p class="tagline">Elige, regala, sorprende — digital y al instante</p>
       <div class="cta-row" role="group" aria-label="Acciones principales">
         <a href="#catalogo" class="btn primary">Ver catálogo</a>
-        <button class="btn" data-open="auth">Crear cuenta</button>
+        <button class="btn outline" onclick="abrirAuth()">Crear cuenta</button>
       </div>
     </div>
   </header>
 
   <section class="slideshow-section" aria-labelledby="destacados-title">
     <h2 id="destacados-title" class="sr-only">Gift cards destacadas</h2>
+
     <div class="slideshow" id="slideshow" role="region" aria-roledescription="carrusel" aria-label="Promociones" aria-live="polite">
       <button class="slide-btn prev" id="slide-prev" aria-label="Anterior" aria-controls="slide-viewport">&#10094;</button>
+
       <div class="slide-viewport" id="slide-viewport">
         <div class="slide-bg" id="slide-bg" aria-hidden="true"></div>
         <div class="slide-card" id="slide-card" role="group" aria-label="Diapositiva"></div>
       </div>
+
       <button class="slide-btn next" id="slide-next" aria-label="Siguiente" aria-controls="slide-viewport">&#10095;</button>
     </div>
+
     <div class="slide-dots" id="slide-dots" role="tablist" aria-label="Seleccionar diapositiva"></div>
   </section>
 
@@ -81,18 +85,22 @@
 
   <div class="modal" id="carrito-modal" role="dialog" aria-modal="true" aria-labelledby="carrito-title">
     <div class="modal-content">
-      <button class="close" data-close aria-label="Cerrar">×</button>
+      <button class="close" onclick="cerrarCarrito()" aria-label="Cerrar">×</button>
       <h2 id="carrito-title">🛍️ Tu Carrito</h2>
+
       <div class="cart-items" id="cart-items" role="list"></div>
 
       <div class="checkout-box" aria-labelledby="pago-title">
         <h3 id="pago-title">💳 Método de pago</h3>
+
         <fieldset class="pay-options">
           <legend class="sr-only">Selecciona método</legend>
+
           <label class="pay-option">
             <input type="radio" name="paymethod" value="whatsapp" checked>
             <span>💬 Pagar por WhatsApp</span>
           </label>
+
           <label class="pay-option">
             <input type="radio" name="paymethod" value="transfer" aria-controls="transfer-form" aria-expanded="false">
             <span>🏦 Transferencia (Cuscatlán / Agrícola)</span>
@@ -105,6 +113,7 @@
             <option value="Cuscatlán">Banco Cuscatlán</option>
             <option value="Agrícola">Banco Agrícola</option>
           </select>
+
           <div class="bank-instructions">
             <p><strong>Datos para Transferencia:</strong></p>
             <ul id="bank-data"></ul>
@@ -119,37 +128,41 @@
       </div>
 
       <div class="totals" id="totales" aria-live="polite"></div>
+
       <div class="checkout-actions">
-        <button class="btn" data-action="vaciar">🗑️ Vaciar carrito</button>
-        <button class="btn primary" id="pay-btn" data-action="pagar">Pagar</button>
+        <button class="secundario-btn" onclick="vaciarCarrito()">🗑️ Vaciar carrito</button>
+        <button class="pagar-wsp-btn" id="pay-btn" onclick="procesarPago()">Pagar</button>
       </div>
     </div>
   </div>
 
   <div class="modal" id="contacto-modal" role="dialog" aria-modal="true" aria-labelledby="contacto-title">
     <div class="modal-content">
-      <button class="close" data-close aria-label="Cerrar">×</button>
+      <button class="close" onclick="cerrarContacto()" aria-label="Cerrar">×</button>
       <h2 id="contacto-title">📞 Contáctanos</h2>
+
       <ul class="contact-list">
         <li>📧 <a href="mailto:ventas-online@tati-shop.com">ventas-online@tati-shop.com</a></li>
         <li>💬 <a href="https://wa.me/50379553318" target="_blank" rel="noopener">WhatsApp: +503 7955 3318</a></li>
       </ul>
+
       <div class="quick-message">
         <label for="contact-msg">Mensaje rápido (opcional):</label>
         <textarea id="contact-msg" placeholder="Escribe tu consulta y te llevamos a WhatsApp con este texto..." rows="3"></textarea>
-        <button class="btn primary" data-action="wsp-contact">Enviar a WhatsApp</button>
+        <button class="pagar-wsp-btn" onclick="enviarWhatsAppContacto()">Enviar a WhatsApp</button>
       </div>
     </div>
   </div>
 
   <div class="modal" id="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-title">
     <div class="modal-content auth">
-      <button class="close" data-close aria-label="Cerrar">×</button>
+      <button class="close" onclick="cerrarAuth()" aria-label="Cerrar">×</button>
+
       <h2 id="auth-title" class="sr-only">Acceder a Tati Shop</h2>
 
       <div class="auth-tabs" role="tablist" aria-label="Autenticación">
-        <button id="tab-login" class="active" data-auth-tab="login" role="tab" aria-selected="true" aria-controls="login-form">Iniciar Sesión</button>
-        <button id="tab-register" data-auth-tab="register" role="tab" aria-selected="false" aria-controls="register-form">Registrarse</button>
+        <button id="tab-login" class="active" onclick="mostrarLogin()" role="tab" aria-selected="true" aria-controls="login-form">Iniciar Sesión</button>
+        <button id="tab-register" onclick="mostrarRegistro()" role="tab" aria-selected="false" aria-controls="register-form">Registrarse</button>
       </div>
 
       <div id="login-form" class="auth-pane" role="tabpanel" aria-labelledby="tab-login">
@@ -157,8 +170,11 @@
         <input type="email" id="login-email" placeholder="tu@email.com" autocomplete="username">
         <label for="login-pass">Contraseña</label>
         <input type="password" id="login-pass" placeholder="********" autocomplete="current-password">
-        <button class="btn primary" data-action="login">Entrar</button>
-        <div class="admin-quick"><button class="btn" data-action="admin-quick">🔐 Acceso rápido Admin</button></div>
+        <button class="pagar-wsp-btn" onclick="login()">Entrar</button>
+
+        <div class="admin-quick">
+          <button class="secundario-btn" onclick="adminAccesoRapido()">🔐 Acceso rápido Admin</button>
+        </div>
       </div>
 
       <div id="register-form" class="auth-pane" style="display:none;" role="tabpanel" aria-labelledby="tab-register">
@@ -168,20 +184,20 @@
         <input type="email" id="reg-email" placeholder="tu@email.com" autocomplete="email">
         <label for="reg-pass">Contraseña</label>
         <input type="password" id="reg-pass" placeholder="********" autocomplete="new-password">
-        <button class="btn primary" data-action="register">Crear cuenta</button>
+        <button class="pagar-wsp-btn" onclick="registrar()">Crear cuenta</button>
       </div>
     </div>
   </div>
 
   <div class="modal" id="admin-modal" role="dialog" aria-modal="true" aria-labelledby="admin-title">
     <div class="modal-content admin">
-      <button class="close" data-close aria-label="Cerrar">×</button>
+      <button class="close" onclick="cerrarAdmin()" aria-label="Cerrar">×</button>
       <h2 id="admin-title">🛠️ Panel Admin</h2>
 
       <div class="admin-header">
         <div><strong>Sesión:</strong> <span id="admin-session-email">-</span></div>
         <div class="admin-actions">
-          <button class="btn" data-action="logout">Cerrar sesión</button>
+          <button class="secundario-btn" onclick="logout()">Cerrar sesión</button>
         </div>
       </div>
 
@@ -190,7 +206,7 @@
           <h3 id="pedidos-title">📦 Pedidos</h3>
           <div class="filters">
             <label for="orders-filter">Filtrar:</label>
-            <select id="orders-filter">
+            <select id="orders-filter" onchange="renderPedidos()">
               <option value="ALL">Todos</option>
               <option value="PENDIENTE">Pendiente</option>
               <option value="PAGADO">Pagado</option>
@@ -205,88 +221,16 @@
           <h3 id="usuarios-title">👥 Usuarios</h3>
           <div id="users-list" class="list" role="list"></div>
         </section>
-
-        <section class="admin-panel" aria-labelledby="codigos-title">
-          <h3 id="codigos-title">🔑 Códigos digitales</h3>
-          <div class="codes-actions">
-            <div class="upload">
-              <label for="codes-file" class="sr-only">Importar CSV</label>
-              <input type="file" id="codes-file" accept=".csv" />
-              <button class="btn" data-action="codes-download-template"><i class="bi bi-filetype-csv"></i> Plantilla CSV</button>
-            </div>
-            <div class="assign-manual">
-              <label>Asignar manual:</label>
-              <input type="text" id="manual-order" placeholder="#Pedido o ID" size="10" />
-              <input type="text" id="manual-item" placeholder="ID Item" size="8" />
-              <input type="text" id="manual-code" placeholder="Código" size="16" />
-              <button class="btn primary" data-action="assign-code">Asignar</button>
-            </div>
-          </div>
-          <div id="codes-stats" class="list" aria-live="polite"></div>
-        </section>
       </div>
     </div>
   </div>
 
-  <div class="modal" id="orders-modal" role="dialog" aria-modal="true" aria-labelledby="orders-title">
-    <div class="modal-content">
-      <button class="close" data-close aria-label="Cerrar">×</button>
-      <h2 id="orders-title">🧾 Mis pedidos</h2>
-      <div id="my-orders" class="list" role="list"></div>
-
-      <template id="order-row-tpl">
-        <article class="order-row" role="listitem">
-          <header>
-            <strong>N.º <span data-fn="order-number"></span></strong>
-            <small> · <time data-fn="order-date"></time></small>
-            <span class="badge" data-fn="order-status"></span>
-          </header>
-          <div class="items" data-fn="order-items"></div>
-        </article>
-      </template>
-
-      <template id="order-item-tpl">
-        <div class="order-item">
-          <div class="info">
-            <div class="name" data-fn="item-name"></div>
-            <div class="sku">SKU: <span data-fn="item-sku"></span></div>
-            <div class="fulfill" data-fn="item-ff-status"></div>
-          </div>
-          <div class="actions">
-            <button class="btn reveal" data-action="reveal" data-fn="btn-reveal" hidden>Revelar código</button>
-            <div class="code" data-fn="code-mask" aria-live="polite"></div>
-            <button class="btn copy" data-action="copy" data-fn="btn-copy" hidden>Copiar</button>
-          </div>
-        </div>
-      </template>
+  <noscript>
+    <div class="noscript">
+      Para usar Tati Shop necesitas habilitar JavaScript.
     </div>
-  </div>
-
-  <div class="modal" id="product-modal" role="dialog" aria-modal="true" aria-labelledby="product-title">
-    <div class="modal-content">
-      <button class="close" data-close aria-label="Cerrar">×</button>
-      <div class="product-detail">
-        <img id="product-logo" alt="" style="max-height:72px;object-fit:contain;">
-        <h3 id="product-title">Producto</h3>
-        <div class="small" id="product-brand"></div>
-        <p id="product-desc" class="small"></p>
-        <label for="product-amount">Selecciona un monto:</label>
-        <select id="product-amount"></select>
-        <div class="btn-row">
-          <button class="btn" id="product-add">Agregar al carrito</button>
-          <button class="btn primary" id="product-buy">Comprar ahora</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <noscript><div class="noscript">Para usar Tati Shop necesitas habilitar JavaScript.</div></noscript>
+  </noscript>
 
   <script src="js/main.js" defer></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(console.error));
-    }
-  </script>
 </body>
 </html>
